@@ -1,0 +1,70 @@
+#!/bin/bash
+
+source "./functions.sh"
+
+cd "$DATA_DIR"
+
+
+# Repository URL Check
+ACTION "URL Checking..."
+INFO "URL: $REPO_URL"
+status="$(curl -sfSL -o /dev/null -w "%{http_code}" "$REPO_URL")"
+if [ "$status" -ne 200 ]; then
+	ERROR "URL Not found"
+	exit 1
+fi
+
+# Server Install
+if [ ! -d ".git" ]; then
+	ACTION "Starting Server Installation"
+	git init
+	git remote add origin "$REPO_URL"
+	git fetch origin main
+	git checkout main
+fi
+
+
+# VENV Install
+if [ ! -d "$VENV_DIR/bin" ]; then
+	ACTION "Starting VENV Creation"
+	python3 -m venv "$VENV_DIR"
+fi
+source "$VENV_DIR/bin/activate"
+echo "source $VENV_DIR/bin/activate" >> ~/.bashrc
+
+
+# VENV module install
+venv_install=true
+if [ -f "$VENV_DIR/.installed" ]; then
+	SUM="$(cat "$VENV_DIR/.installed")"
+	if echo "$SUM" "$DATA_DIR/requirements.txt" | sha256sum -c - > /dev/null 2>&1; then
+		venv_install=false
+	fi
+fi
+if [ "$venv_install" == "true" ]; then
+	ACTION "Start VENV Module Updating"
+	pip install -U pip
+	if ! pip install -Ur "$DATA_DIR/requirements.txt"; then
+		ERROR "Update Error"
+		exit 1
+	fi
+	sha256sum "$DATA_DIR/requirements.txt" | awk '{print $1}' > "$VENV_DIR/.installed"
+fi
+
+
+cd "$FRONTEND_DIR"
+
+# Server Setting
+if [ $ALLOWED_HOSTS_ENABLED = true ]; then
+	ACTION "Change Setting"
+	test -z "$ALLOWED_HOSTS" && ALLOWED_HOSTS="$(hostname -i)"
+	HOSTS="ALLOWED_HOSTS = [$(echo "\"$ALLOWED_HOSTS\"" | sed -E "s/,[[:blank:]]/,/g; s/[[:blank:]],/,/g; s/,,?+/,/g; s/,/\", \"/g")]"
+	SUCCESS "$HOSTS"
+	sed -i "s/^ALLOWED_HOSTS.*/$HOSTS/g" "$CONFIG_FILE"
+fi
+
+# Server Start
+mkdir -p "$FRONTEND_DIR/"{storage,compressed_storage,temp_storage}
+ACTION "Server has been Started"
+python3 manage.py migrate
+python3 manage.py runserver 0.0.0.0:8000
