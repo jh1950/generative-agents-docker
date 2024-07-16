@@ -56,11 +56,11 @@ fi
 cd "$FRONTEND_DIR" || exit 1
 
 # Server Setting
-if [ "$ALLOWED_HOSTS_ENABLED" = true ]; then
+if [ "$ALLOWED_HOSTS" != "manual" ]; then
 	ACTION "Change Setting"
 	test -z "$ALLOWED_HOSTS" && ALLOWED_HOSTS="$(hostname -i)"
 	HOSTS="ALLOWED_HOSTS = [$(echo "\"$ALLOWED_HOSTS\"" | sed -E "s/,[[:blank:]]/,/g; s/[[:blank:]],/,/g; s/,,?+/,/g; s/,/\", \"/g")]"
-	SUCCESS "$HOSTS"
+	INFO "$HOSTS"
 	sed -i "s/^ALLOWED_HOSTS.*/$HOSTS/g" "$CONFIG_FILE"
 fi
 

@@ -1,0 +1,14 @@
+---
+services:
+  generative_agents:
+    container_name: generative_agents
+    image: jh1950/generative-agents-docker:latest
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      PUID: 1000
+      PGID: 1000
+      ALLOWED_HOSTS: "*"
+    volumes:
+      - ./data:/data

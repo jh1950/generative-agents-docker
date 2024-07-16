@@ -1,5 +1,5 @@
 ---
-name: Lint
+name: Linting
 on:  # yamllint disable-line rule:truthy
   push:
     branches:
@@ -8,7 +8,7 @@ on:  # yamllint disable-line rule:truthy
     branches:
       - main
 
-run-name: Lint
+run-name: Linting
 
 jobs:
   Dockerfile:
