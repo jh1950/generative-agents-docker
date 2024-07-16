@@ -1,7 +1,7 @@
 #!/bin/bash
 
 export DATA_DIR="/data"
-export VENV_DIR="$DATA_DIR/venv"\
+export VENV_DIR="$DATA_DIR/venv"
 
 export REPO_URL="https://github.com/jh1950/generative_agents"
 export FRONTEND_DIR="$DATA_DIR/environment/frontend_server"

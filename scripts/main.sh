@@ -1,8 +1,6 @@
 #!/bin/bash
 
-source "./functions.sh"
-
-cd "$DATA_DIR"
+source "/scripts/functions.sh"
 
 
 # Repository URL Check
@@ -14,8 +12,10 @@ if [ "$status" -ne 200 ]; then
 	exit 1
 fi
 
+
 # Server Install
-if [ ! -d ".git" ]; then
+if [ ! -d "$DATA_DIR/.git" ]; then
+	cd "$DATA_DIR" || exit 1
 	ACTION "Starting Server Installation"
 	git init
 	git remote add origin "$REPO_URL"
@@ -29,6 +29,7 @@ if [ ! -d "$VENV_DIR/bin" ]; then
 	ACTION "Starting VENV Creation"
 	python3 -m venv "$VENV_DIR"
 fi
+# shellcheck disable=SC1091
 source "$VENV_DIR/bin/activate"
 echo "source $VENV_DIR/bin/activate" >> ~/.bashrc
 
@@ -52,10 +53,10 @@ if [ "$venv_install" == "true" ]; then
 fi
 
 
-cd "$FRONTEND_DIR"
+cd "$FRONTEND_DIR" || exit 1
 
 # Server Setting
-if [ $ALLOWED_HOSTS_ENABLED = true ]; then
+if [ "$ALLOWED_HOSTS_ENABLED" = true ]; then
 	ACTION "Change Setting"
 	test -z "$ALLOWED_HOSTS" && ALLOWED_HOSTS="$(hostname -i)"
 	HOSTS="ALLOWED_HOSTS = [$(echo "\"$ALLOWED_HOSTS\"" | sed -E "s/,[[:blank:]]/,/g; s/[[:blank:]],/,/g; s/,,?+/,/g; s/,/\", \"/g")]"

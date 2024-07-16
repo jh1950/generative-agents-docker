@@ -3,11 +3,11 @@
 # Beautiful Logs
 
 RESET=0
-BLACK=30
+# BLACK=30
 RED=31
 GREEN=32
 YELLOW=33
-BLUE=34
+# BLUE=34
 PURPLE=35
 CYAN=36
 WHITE=37
@@ -52,9 +52,9 @@ LOG() {
 		local LIGHT=false
 		COLOR="$WHITE"
 	fi
-	test $LIGHT = true && ((COLOR+=60))
-	test $BOLD = true && COLOR="1;$COLOR"
-	test $NEWLINE = true && NL="\n"
+	test "$LIGHT" = true && ((COLOR+=60))
+	test "$BOLD" = true && COLOR="1;$COLOR"
+	test "$NEWLINE" = true && NL="\n"
 
 	echo -en "\e[${COLOR}m${MSG}\e[${RESET}m${NL}"
 }
