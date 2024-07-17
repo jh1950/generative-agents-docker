@@ -9,6 +9,7 @@ services:
     environment:
       PUID: 1000
       PGID: 1000
+      AUTO_UPDATE: false
       ALLOWED_HOSTS: "*"
     volumes:
       - ./data:/data

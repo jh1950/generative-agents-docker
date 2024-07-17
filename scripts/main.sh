@@ -13,14 +13,24 @@ if [ "$status" -ne 200 ]; then
 fi
 
 
-# Server Install
+# Server Install/Update
+cd "$DATA_DIR" || exit 1
 if [ ! -d "$DATA_DIR/.git" ]; then
-	cd "$DATA_DIR" || exit 1
 	ACTION "Starting Server Installation"
 	git init
 	git remote add origin "$REPO_URL"
 	git fetch origin main
 	git checkout main
+elif [ "$AUTO_UPDATE" = true ]; then
+	CURRENT_COMMIT=$(git log HEAD -1 --format=format:%H)
+	LATEST_COMMIT=$(curl -sfSL "$REPO_API/commits/main" | jq .sha -r)
+	if [ "$CURRENT_COMMIT" != "$LATEST_COMMIT" ]; then
+		ACTION "Starting Server Update"
+		git stash
+		git fetch origin main
+		git pull origin main
+		git stash clear
+	fi
 fi
 
 
