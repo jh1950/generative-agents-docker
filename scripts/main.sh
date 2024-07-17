@@ -35,17 +35,15 @@ echo "source $VENV_DIR/bin/activate" >> ~/.bashrc
 
 
 # VENV Module Update
-if [ -f "$VENV_DIR/.installed" ]; then
-	SUM="$(cat "$VENV_DIR/.installed")"
-	if ! echo "$SUM" "$DATA_DIR/requirements.txt" | sha256sum -c - > /dev/null 2>&1; then
-		ACTION "Start VENV Module Updating"
-		pip install -U pip
-		if ! pip install -Ur "$DATA_DIR/requirements.txt"; then
-			ERROR "Update Error"
-			exit 1
-		fi
-		sha256sum "$DATA_DIR/requirements.txt" | awk '{print $1}' > "$VENV_DIR/.installed"
+SHASUM="$(cat "$VENV_DIR/.installed" 2> /dev/null)"
+if ! echo "$SHASUM" "$DATA_DIR/requirements.txt" | sha256sum -c - > /dev/null 2>&1; then
+	ACTION "Starting Module Update"
+	pip install -U pip
+	if ! pip install -Ur "$DATA_DIR/requirements.txt"; then
+		ERROR "Update Error"
+		exit 1
 	fi
+	sha256sum "$DATA_DIR/requirements.txt" | awk '{print $1}' > "$VENV_DIR/.installed"
 fi
 
 
