@@ -15,6 +15,7 @@ RUN apt-get update -y \
  && useradd -ms /bin/bash user
 
 COPY --chmod=755 ./scripts /scripts
+RUN chown -R user:user /scripts
 
 WORKDIR /scripts
 

@@ -8,12 +8,12 @@ RED=31
 GREEN=32
 YELLOW=33
 # BLUE=34
-PURPLE=35
+MAGENTA=35
 CYAN=36
 WHITE=37
 
 BOLD=true
-LIGHT=false
+BLIGHT=false
 NEWLINE=true
 
 
@@ -30,7 +30,7 @@ SUCCESS() {
 }
 
 IMPORTANT() {
-	LOG "$*" "$PURPLE"
+	LOG "$*" "$MAGENTA"
 }
 
 INFO() {
@@ -45,16 +45,20 @@ ACTION() {
 LOG() {
 	local MSG="$1"
 	local COLOR="$2"
-	local NL="\n"
+	local NL=""
 
 	if [ -z "$COLOR" ]; then
-		local BOLD=""
-		local LIGHT=false
-		COLOR="$WHITE"
+		INFO "$MSG"
+		return
 	fi
-	test "$LIGHT" = true && ((COLOR+=60))
+	test "$BLIGHT" = true && ((COLOR+=60))
 	test "$BOLD" = true && COLOR="1;$COLOR"
 	test "$NEWLINE" = true && NL="\n"
 
 	echo -en "\e[${COLOR}m${MSG}\e[${RESET}m${NL}"
+}
+
+LOG_WITHOUT_NEWLINE() {
+	local NEWLINE=false
+	"$@"
 }

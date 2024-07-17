@@ -12,7 +12,7 @@ on:  # yamllint disable-line rule:truthy
       - published
 
 jobs:
-  publish:
+  Publish:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

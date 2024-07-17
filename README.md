@@ -13,9 +13,9 @@ docker pull jh1950/generative-agents-docker:latest
 
 ## 실행
 
-먼저 [docker-compose.yml](/docker-compose.yml) 파일을 생성한 후 해당 파일이 위치한 곳에서 아래 명령어를 실행합니다.
+먼저 [docker-compose.yml](https://github.com/jh1950/generative-agents-docker/blob/main/docker-compose.yml) 파일을 생성한 후 해당 파일이 위치한 곳에서 아래 명령어를 실행합니다.
 
 ```bash
 docker compose up -d
-# docker compose stop # 중지
+# docker compose down # 중지
 ```
