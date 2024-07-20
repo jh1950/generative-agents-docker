@@ -65,7 +65,11 @@ if [ "$ALLOWED_HOSTS" != "manual" ]; then
 	test -z "$ALLOWED_HOSTS" && ALLOWED_HOSTS="$(hostname -i)"
 	HOSTS="ALLOWED_HOSTS = [$(echo "\"$ALLOWED_HOSTS\"" | sed -E "s/,[[:blank:]]/,/g; s/[[:blank:]],/,/g; s/,,?+/,/g; s/,/\", \"/g")]"
 	INFO "$HOSTS"
-	sed -i "s/^ALLOWED_HOSTS.*/$HOSTS/g" "$CONFIG_FILE"
+	if grep -q ^"ALLOWED_HOSTS.*=" "$CONFIG_FILE"; then
+		sed -i "s/^ALLOWED_HOSTS.*/$HOSTS/g" "$CONFIG_FILE"
+	else
+		echo "$HOSTS" >> "$CONFIG_FILE"
+	fi
 fi
 
 # Server Start
