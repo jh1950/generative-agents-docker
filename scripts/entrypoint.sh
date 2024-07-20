@@ -17,7 +17,7 @@ fi
 
 
 ACTION "Change UID/PID"
-INFO "User PID: ${PUID}"
+INFO "User UID: ${PUID}"
 INFO "User GID: ${PGID}"
 mkdir -p "$VENV_DIR"
 usermod -o -u "${PUID}" user > /dev/null 2>&1
