@@ -62,3 +62,17 @@ LOG_WITHOUT_NEWLINE() {
 	local NEWLINE=false
 	"$@"
 }
+
+
+# Don't use settings that span multiple lines like INSTALLED_APPS, MIDDLEWARE
+DJANGO_CONFIG_SETTING() {
+	local key="$1"
+	local val="$2"
+	local full="$key = $val"
+
+	if grep -q ^"$key.*=" "$CONFIG_FILE"; then
+		sed -i "s/^$key.*/${full//\//\\\/}/g" "$CONFIG_FILE"
+	else
+		echo "$full" >> "$CONFIG_FILE"
+	fi
+}

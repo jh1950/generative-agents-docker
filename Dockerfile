@@ -20,9 +20,11 @@ RUN chown -R user:user /scripts
 
 WORKDIR /scripts
 
-ENV PUID=1000 \
+ENV TZ="UTC" \
+    PUID=1000 \
     PGID=1000 \
     AUTO_UPDATE=false \
+    SYNC_TZ=true \
     ALLOWED_HOSTS=""
 
 HEALTHCHECK \

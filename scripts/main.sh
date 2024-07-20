@@ -59,18 +59,20 @@ fi
 
 cd "$FRONTEND_DIR" || exit 1
 
+if [ "$SYNC_TZ" = true ]; then
+	DJANGO_CONFIG_SETTING TIME_ZONE "\"$TZ\""
+fi
+
+
 # Server Setting
 if [ "$ALLOWED_HOSTS" != "manual" ]; then
 	ACTION "Change Setting"
 	test -z "$ALLOWED_HOSTS" && ALLOWED_HOSTS="$(hostname -i)"
-	HOSTS="ALLOWED_HOSTS = [$(echo "\"$ALLOWED_HOSTS\"" | sed -E "s/,[[:blank:]]/,/g; s/[[:blank:]],/,/g; s/,,?+/,/g; s/,/\", \"/g")]"
-	INFO "$HOSTS"
-	if grep -q ^"ALLOWED_HOSTS.*=" "$CONFIG_FILE"; then
-		sed -i "s/^ALLOWED_HOSTS.*/$HOSTS/g" "$CONFIG_FILE"
-	else
-		echo "$HOSTS" >> "$CONFIG_FILE"
-	fi
+	HOSTS="[$(echo "\"$ALLOWED_HOSTS\"" | sed -E "s/,[[:blank:]]/,/g; s/[[:blank:]],/,/g; s/,,?+/,/g; s/,/\", \"/g")]"
+	INFO "ALLOWED_HOSTS = $HOSTS"
+	DJANGO_CONFIG_SETTING ALLOWED_HOSTS "$HOSTS"
 fi
+
 
 # Server Start
 mkdir -p "$FRONTEND_DIR/"{storage,compressed_storage,temp_storage}
