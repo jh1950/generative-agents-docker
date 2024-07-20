@@ -5,6 +5,11 @@
 [![Docker Hub](https://img.shields.io/badge/Docker-Hub-blue?logo=docker)](https://hub.docker.com/r/jh1950/generative-agents-docker)
 [![GHCR](https://img.shields.io/badge/GHCR-Package-blue?logo=docker)](https://github.com/jh1950/generative-agents-docker/pkgs/container/generative-agents-docker)
 
+> [!NOTE]
+> 이 소스코드는 [MIT 라이선스](https://github.com/jh1950/generative-agents-docker/blob/main/LICENSE)를 따르지만,
+> [포함된 프로젝트](https://github.com/jh1950/generative_agents)는
+> [아파치 라이선스](https://www.apache.org/licenses/LICENSE-2.0.txt)를 따름을 알려드립니다.
+
 [jh1950/generative_agents](https://github.com/jh1950/generative_agents) 전용 컨테이너입니다.
 
 ## 이미지 설치
