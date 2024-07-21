@@ -89,8 +89,9 @@ DJANGO_CONFIG_SETTING() {
 	local key="$1"
 	local val="$2"
 	local full="$key = $val"
-	local CONFIG_FILE="$(FIND_CONFIG_FILE)"
+	local CONFIG_FILE
 
+	CONFIG_FILE="$(FIND_CONFIG_FILE)"
 	if grep -q ^"$key.*=" "$CONFIG_FILE"; then
 		sed -i "s/^$key.*/${full//\//\\\/}/g" "$CONFIG_FILE"
 	else
