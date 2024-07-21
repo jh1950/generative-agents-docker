@@ -5,22 +5,24 @@
 > [Generative Agents](https://github.com/jh1950/generative_agents)는
 > [아파치 라이선스](https://www.apache.org/licenses/LICENSE-2.0.txt)를 따릅니다.
 
-![License](https://img.shields.io/github/license/jh1950/generative-agents-docker?label=License)
-![Include License](https://img.shields.io/github/license/jh1950/generative_agents?&label=Include)
+[![License](https://img.shields.io/github/license/jh1950/generative-agents-docker?label=License)](https://github.com/jh1950/generative-agents-docker/blob/main/LICENSE)
+[![Include License](https://img.shields.io/github/license/jh1950/generative_agents?&label=Include)](https://www.apache.org/licenses/LICENSE-2.0.txt)
 
 [![GitHub](https://img.shields.io/badge/GitHub-Source-blue?logo=github)](https://github.com/jh1950/generative-agents-docker)
 [![Latest Version](https://img.shields.io/github/v/release/jh1950/generative-agents-docker?label=Latest)](https://github.com/jh1950/generative-agents-docker/releases)
 [![Source Size](https://img.shields.io/github/repo-size/jh1950/generative-agents-docker?label=Source)](https://github.com/jh1950/generative-agents-docker)
 [![Image Size](https://img.shields.io/docker/image-size/jh1950/generative-agents-docker?label=Image)](https://hub.docker.com/r/jh1950/generative-agents-docker/tags)
 
-![Publish](https://github.com/jh1950/generative-agents-docker/actions/workflows/docker-publish.yml/badge.svg)
-![Linting](https://github.com/jh1950/generative-agents-docker/actions/workflows/linting.yml/badge.svg)
+[![Publish](https://github.com/jh1950/generative-agents-docker/actions/workflows/docker-publish.yml/badge.svg)](https://github.com/jh1950/generative-agents-docker/actions/workflows/docker-publish.yml)
+[![Linting](https://github.com/jh1950/generative-agents-docker/actions/workflows/linting.yml/badge.svg)](https://github.com/jh1950/generative-agents-docker/actions/workflows/linting.yml)
 
 [![Docker Hub](https://img.shields.io/badge/Docker-Hub-blue?logo=docker)](https://hub.docker.com/r/jh1950/generative-agents-docker)
 [![GHCR](https://img.shields.io/badge/GHCR-Package-blue?logo=docker)](https://github.com/jh1950/generative-agents-docker/pkgs/container/generative-agents-docker)
 
-[joonspk-research/generative_agents](https://github.com/joonspk-research/generative_agents)의 포크 버전인
-[jh1950/generative_agents](https://github.com/jh1950/generative_agents) 전용 컨테이너입니다.
+[jh1950/generative_agents](https://github.com/jh1950/generative_agents)
+전용 컨테이너로 만들기 시작했으며, 현재는 원본 프로젝트인
+[joonspk-research/generative_agents](https://github.com/joonspk-research/generative_agents)
+와 다른 포크된 버전도 사용할 수 있습니다.
 
 
 ## 이미지 설치
@@ -100,14 +102,17 @@ docker exec -it generative_agents venv
 
 `docker-compose.yml` 파일에서 설정 가능한 환경 변수 목록입니다.
 
-| 변수명                            | 설명                                                               | 기본값           | 설정 가능한 값                                                                              | 추가된 버전 |
-|-----------------------------------|--------------------------------------------------------------------|------------------|---------------------------------------------------------------------------------------------|-------------|
-| TZ                                | 컨테이너 타임존                                                    | UTC              | [TZ Identifiers(식별자)](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) 참고 | 0.1.0       |
-| PUID                              | 서버를 실행할 유저의 UID (`id -u` 명령어로 확인 가능)              | 1000             | 1~                                                                                          | 0.1.0       |
-| PGID                              | 서버를 실행할 그룹의 GID (`id -g` 명령어로 확인 가능)              | 1000             | 1~                                                                                          | 0.1.0       |
-| _**[AUTO_UPDATE](#auto_update)**_ | 서버 실행 전 서버 업데이트 확인 및 진행                            | false            | boolean                                                                                     | 0.2.0       |
-| SYNC_TZ                           | 프론트엔드 타임존을 컨테이너 타임존과 동기화                       | true             | boolean                                                                                     | 0.3.1       |
-| ALLOWED_HOSTS\*                   | 프론트엔드 접속 허용 IP를 설정 (쉼표로 구분하여 여러 값 설정 가능) | 컨테이너 내부 IP | `IP`, `IP, Domain, ...`, `manual`                                                           | 0.1.0       |
+| 변수명                            | 설명                                                               | 기본값                                        | 설정 가능한 값                                                                              | 추가된 버전 |
+|-----------------------------------|--------------------------------------------------------------------|-----------------------------------------------|---------------------------------------------------------------------------------------------|-------------|
+| TZ                                | 컨테이너 타임존                                                    | `UTC`                                         | [TZ Identifiers(식별자)](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) 참고 | 0.1.0       |
+| PUID                              | 서버를 실행할 유저의 UID (`id -u` 명령어로 확인 가능)              | `1000`                                        | 1~                                                                                          | 0.1.0       |
+| PGID                              | 서버를 실행할 그룹의 GID (`id -g` 명령어로 확인 가능)              | `1000`                                        | 1~                                                                                          | 0.1.0       |
+| REPO_URL                          | 설치할 서버의 URL                                                  | `https://github.com/jh1950/generative_agents` | 원본 프로젝트 및 포크된 버전의 URL                                                          | 0.4.0       |
+| FRONTEND_ROOT                     | 프론트엔드 루트 경로                                               | `environment/frontend_server`                 | `path`, `./path`, `/path`                                                                   | 0.4.0       |
+| CONFIG_FILE                       | 프론트엔드 설정 파일 경로                                          | `.../settings.py`, `.../settings/local.py`    | `path/file.py`, `./path/file.py`, `/path/file.py`                                           | 0.4.0       |
+| _**[AUTO_UPDATE](#auto_update)**_ | 서버 실행 전 서버 업데이트 확인 및 진행                            | `false`                                       | boolean                                                                                     | 0.2.0       |
+| SYNC_TZ                           | 프론트엔드 타임존을 컨테이너 타임존과 동기화                       | `true`                                        | boolean                                                                                     | 0.3.1       |
+| ALLOWED_HOSTS\*                   | 프론트엔드 접속 허용 IP를 설정 (쉼표로 구분하여 여러 값 설정 가능) | 컨테이너 내부 IP                              | `IP`, `IP, Domain, ...`, `manual`                                                           | 0.1.0       |
 
 \* `ALLOWED_HOSTS` 값을 `manual`로 설정 시 `environment/frontend_server/config/settings/local.py` 파일에서 직접 설정할 수 있습니다.
 
