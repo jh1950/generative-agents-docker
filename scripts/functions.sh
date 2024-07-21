@@ -64,11 +64,32 @@ LOG_WITHOUT_NEWLINE() {
 }
 
 
+GET_REPO_IN_URL() {
+	local url="$1"
+	awk -F ':|/' '{print $(NF-1) "/" $NF}' <<< "$url"
+}
+
+FIND_CONFIG_FILE() {
+	local CONFIG_DIR
+
+	if [ -z "$CONFIG_FILE" ]; then
+		CONFIG_DIR="$(grep "os.environ.setdefault" "$FRONTEND_DIR/manage.py" | awk -F "'|)" '{print $4}' | tr "." "/")"
+		if [ ! -d "$CONFIG_DIR" ]; then
+			CONFIG_FILE="${CONFIG_DIR}.py"
+		else
+			CONFIG_FILE="$CONFIG_DIR/local.py"
+		fi
+	fi
+
+	echo "$FRONTEND_DIR/$CONFIG_FILE"
+}
+
 # Don't use settings that span multiple lines like INSTALLED_APPS, MIDDLEWARE
 DJANGO_CONFIG_SETTING() {
 	local key="$1"
 	local val="$2"
 	local full="$key = $val"
+	local CONFIG_FILE="$(FIND_CONFIG_FILE)"
 
 	if grep -q ^"$key.*=" "$CONFIG_FILE"; then
 		sed -i "s/^$key.*/${full//\//\\\/}/g" "$CONFIG_FILE"

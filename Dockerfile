@@ -26,6 +26,10 @@ WORKDIR /scripts
 ENV TZ="UTC" \
     PUID=1000 \
     PGID=1000 \
+    REPO_URL="https://github.com/jh1950/generative_agents" \
+    FRONTEND="environment/frontend_server" \
+    BACKEND="reverie/backend_server" \
+    CONFIG_FILE="" \
     AUTO_UPDATE=false \
     SYNC_TZ=true \
     ALLOWED_HOSTS=""

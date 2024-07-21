@@ -8,7 +8,7 @@ ACTION "URL Checking..."
 INFO "URL: $REPO_URL"
 status="$(curl -sfSL -o /dev/null -w "%{http_code}" "$REPO_URL")"
 if [ "$status" -ne 200 ]; then
-	ERROR "URL Not found"
+	ERROR "Invalid URL: $REPO_URL"
 	exit 1
 fi
 
@@ -22,13 +22,21 @@ if [ ! -d "$DATA_DIR/.git" ]; then
 	git fetch origin main
 	git checkout main
 elif [ "$AUTO_UPDATE" = true ]; then
-	CURRENT_COMMIT=$(git log HEAD -1 --format=format:%H)
-	LATEST_COMMIT=$(curl -sfSL "$REPO_API/commits/main" | jq .sha -r)
-	if [ "$CURRENT_COMMIT" != "$LATEST_COMMIT" ]; then
-		ACTION "Starting Server Update"
-		git stash save "$(date "+%F %T")"
-		git fetch origin main
-		git pull origin main
+	INSTALLED_URL="$(git config remote.origin.url)"
+	INSTALLED_REPO="$(GET_REPO_IN_URL "$INSTALLED_URL")"
+	SET_REPO="$(GET_REPO_IN_URL "$REPO_URL")"
+	if [ "$INSTALLED_REPO" != "$SET_REPO" ]; then
+		INFO "Installed URL: $INSTALLED_URL"
+		ERROR "The URL and the installed server do not match, so the update cannot checked."
+	else
+		CURRENT_COMMIT=$(git log HEAD -1 --format=format:%H)
+		LATEST_COMMIT=$(curl -sfSL "$REPO_API/commits/main" | jq .sha -r)
+		if [ "$CURRENT_COMMIT" != "$LATEST_COMMIT" ]; then
+			ACTION "Starting Server Update"
+			git stash save "$(date "+%F %T")"
+			git fetch origin main
+			git pull origin main
+		fi
 	fi
 fi
 
