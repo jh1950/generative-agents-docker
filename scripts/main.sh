@@ -26,10 +26,9 @@ elif [ "$AUTO_UPDATE" = true ]; then
 	LATEST_COMMIT=$(curl -sfSL "$REPO_API/commits/main" | jq .sha -r)
 	if [ "$CURRENT_COMMIT" != "$LATEST_COMMIT" ]; then
 		ACTION "Starting Server Update"
-		git stash
+		git stash save "$(date "+%F %T")"
 		git fetch origin main
 		git pull origin main
-		git stash clear
 	fi
 fi
 
