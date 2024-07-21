@@ -22,6 +22,7 @@
 [joonspk-research/generative_agents](https://github.com/joonspk-research/generative_agents)의 포크 버전인
 [jh1950/generative_agents](https://github.com/jh1950/generative_agents) 전용 컨테이너입니다.
 
+
 ## 이미지 설치
 
 아래 명령어를 실행합니다.
@@ -30,17 +31,19 @@
 docker pull jh1950/generative-agents-docker:latest
 ```
 
+
 ## 컨테이너 실행
 
 컨테이너를 실행하려면 먼저 임의의 폴더를 생성한 후 그 안에
 [docker-compose.yml](https://github.com/jh1950/generative-agents-docker/blob/main/docker-compose.yml)
-파일을 작성합니다.
+파일을 작성하고, 필요한 경우 [환경 변수](#환경-변수)를 수정합니다.
 
 그 후 해당 파일이 위치한 곳에서 아래 명령어를 실행합니다.
 
 ```bash
 docker compose up -d
 ```
+
 
 ## 컨테이너 중지
 
@@ -52,6 +55,7 @@ docker compose up -d
 docker compose down
 ```
 
+
 ## 컨테이너 로그
 
 > [!TIP]
@@ -61,6 +65,32 @@ docker compose down
 docker compose logs
 # or docker logs generative_agents
 ```
+
+
+## 컨테이너 접속
+
+> [!TIP]
+> 접속을 종료하려면 아무것도 입력하지 않은 상태에서 `Ctrl+d`를 누릅니다.
+
+컨테이너에 연결하여 컨테이너 내 파이썬 환경을 그대로 사용할 수 있습니다.
+
+### Bash
+
+가상환경이 적용된 Bash
+
+```bash
+docker exec -it --user user generative_agents bash # 0.1.0 ~
+# or docker exec -it generative_agents shell
+```
+
+### Python
+
+Interactive 모드로, 프론트엔드인 Django 서버와 연결됩니다.
+
+```bash
+docker exec -it generative_agents venv
+```
+
 
 ## 환경 변수
 
@@ -76,15 +106,15 @@ docker compose logs
 | PUID                              | 서버를 실행할 유저의 UID (`id -u` 명령어로 확인 가능)              | 1000             | 1~                                                                                          | 0.1.0       |
 | PGID                              | 서버를 실행할 그룹의 GID (`id -g` 명령어로 확인 가능)              | 1000             | 1~                                                                                          | 0.1.0       |
 | _**[AUTO_UPDATE](#auto_update)**_ | 서버 실행 전 서버 업데이트 확인 및 진행                            | false            | boolean                                                                                     | 0.2.0       |
-| SYNC_TZ                           | 프론트앤드 타임존을 컨테이너 타임존과 동기화                       | true             | boolean                                                                                     | 0.3.1       |
-| ALLOWED_HOSTS\*                   | 프론트앤드 접속 허용 IP를 설정 (쉼표로 구분하여 여러 값 설정 가능) | 컨테이너 내부 IP | `IP`, `IP, Domain, ...`, `manual`                                               | 0.1.0       |
+| SYNC_TZ                           | 프론트엔드 타임존을 컨테이너 타임존과 동기화                       | true             | boolean                                                                                     | 0.3.1       |
+| ALLOWED_HOSTS\*                   | 프론트엔드 접속 허용 IP를 설정 (쉼표로 구분하여 여러 값 설정 가능) | 컨테이너 내부 IP | `IP`, `IP, Domain, ...`, `manual`                                                           | 0.1.0       |
 
 \* `ALLOWED_HOSTS` 값을 `manual`로 설정 시 `environment/frontend_server/config/settings/local.py` 파일에서 직접 설정할 수 있습니다.
 
 ### AUTO_UPDATE
 
 > [!CAUTION]
-> 버전 `v0.3.1` 이하에서는 변경된 내용이 **임시저장되지 않습니다**.
+> 버전 `0.3.1` 이하에서는 변경된 내용이 **임시저장되지 않습니다**.
 
 <!-- markdownlint-disable-line MD028 -->
 > [!IMPORTANT]

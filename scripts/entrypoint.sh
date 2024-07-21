@@ -30,7 +30,7 @@ INFO "User GID: ${PGID}"
 mkdir -p "$VENV_DIR"
 usermod -o -u "${PUID}" user > /dev/null 2>&1
 groupmod -o -g "${PGID}" user > /dev/null 2>&1
-chown -R user:user "$DATA_DIR" "$VENV_DIR" /home/user
+chown -R user:user "$DATA_DIR" "$VENV_DIR" /home/user /scripts
 
 
 su user -c ./main.sh &

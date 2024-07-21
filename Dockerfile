@@ -16,7 +16,10 @@ RUN apt-get update -y \
  && useradd -ms /bin/bash user
 
 COPY --chmod=755 ./scripts /scripts
-RUN chown -R user:user /scripts
+RUN for file in shell venv django-shell; do \
+        cp /scripts/connect-copy.sh /usr/local/bin/"$file"; \
+    done \
+ && chown -R user:user /scripts
 
 WORKDIR /scripts
 
