@@ -98,3 +98,25 @@ DJANGO_CONFIG_SETTING() {
 		echo "$full" >> "$CONFIG_FILE"
 	fi
 }
+
+USER_RUN() {
+	local root=false
+
+	if [ "$EUID" -eq 0 ]; then
+		root=true
+	elif [ "$(id -u)" -ne "$PUID" ] || [ "$(id -g)" -ne "$PGID" ]; then
+		ERROR "Permission denied"
+		return 1
+	fi
+
+	if [ "$root" = true ]; then
+		if grep -q ^"$*"$ /etc/shells; then
+			su user -s "$*"
+		else
+			su user -c "$*"
+		fi
+	else
+		"$@"
+	fi
+	return "$?"
+}
