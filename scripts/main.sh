@@ -46,8 +46,6 @@ if [ ! -d "$VENV_DIR/bin" ]; then
 	ACTION "Starting VENV Creation"
 	python3 -m venv "$VENV_DIR"
 fi
-# shellcheck disable=SC1091
-source "$VENV_DIR/bin/activate"
 echo "source $VENV_DIR/bin/activate" >> ~/.bashrc
 
 
@@ -55,8 +53,8 @@ echo "source $VENV_DIR/bin/activate" >> ~/.bashrc
 SHASUM="$(cat "$VENV_DIR/.installed" 2> /dev/null)"
 if ! echo "$SHASUM" "$DATA_DIR/requirements.txt" | sha256sum -c - > /dev/null 2>&1; then
 	ACTION "Starting Module Update"
-	pip install -U pip
-	if ! pip install -Ur "$DATA_DIR/requirements.txt"; then
+	$PIP install -U pip
+	if ! $PIP install -Ur "$DATA_DIR/requirements.txt"; then
 		ERROR "Update Error"
 		exit 1
 	fi
@@ -64,14 +62,13 @@ if ! echo "$SHASUM" "$DATA_DIR/requirements.txt" | sha256sum -c - > /dev/null 2>
 fi
 
 
+# Server Setting
 cd "$FRONTEND_DIR" || exit 1
 
 if [ "$SYNC_TZ" = true ]; then
 	DJANGO_CONFIG_SETTING TIME_ZONE "\"$TZ\""
 fi
 
-
-# Server Setting
 if [ "$ALLOWED_HOSTS" != "manual" ]; then
 	ACTION "Change Setting"
 	test -z "$ALLOWED_HOSTS" && ALLOWED_HOSTS="$(hostname -i)"
@@ -84,5 +81,5 @@ fi
 # Server Start
 mkdir -p "$FRONTEND_DIR/"{storage,compressed_storage,temp_storage}
 ACTION "Server has been Started"
-python3 manage.py migrate
-python3 manage.py runserver 0.0.0.0:8000
+$PYTHON manage.py migrate
+$PYTHON manage.py runserver 0.0.0.0:8000

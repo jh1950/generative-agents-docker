@@ -10,7 +10,7 @@ case "$mode" in
 		USER_RUN /bin/bash
 		;;
 	venv|django-shell)
-		USER_RUN "$VENV_DIR/bin/python3" "$FRONTEND_DIR/manage.py" shell
+		USER_RUN "$PYTHON" "$FRONTEND_DIR/manage.py" shell
 		;;
 	*)
 		echo "Usage: connect [shell|venv|django-shell]"
