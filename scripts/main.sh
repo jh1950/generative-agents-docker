@@ -77,9 +77,13 @@ if [ "$ALLOWED_HOSTS" != "manual" ]; then
 	DJANGO_CONFIG_SETTING ALLOWED_HOSTS "$HOSTS"
 fi
 
+if [ "$CUSTOM_UTILS" = false ]; then
+	cp /scripts/utils.py "$BACKEND_DIR/utils.py"
+fi
 
-# Server Start
+
+# Front-end Start
 mkdir -p "$FRONTEND_DIR/"{storage,compressed_storage,temp_storage}
-ACTION "Server has been Started"
+ACTION "Front-end has been Started"
 $PYTHON manage.py migrate
 $PYTHON manage.py runserver 0.0.0.0:8000

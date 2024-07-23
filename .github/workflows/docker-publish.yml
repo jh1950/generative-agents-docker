@@ -6,7 +6,7 @@ on:  # yamllint disable-line rule:truthy
       - main
     paths:
       - "Dockerfile"
-      - "scripts/*.sh"
+      - "scripts/*"
   release:
     types:
       - published

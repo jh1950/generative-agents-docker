@@ -102,17 +102,21 @@ docker exec -it generative_agents venv
 
 `docker-compose.yml` 파일에서 설정 가능한 환경 변수 목록입니다.
 
-| 변수명                            | 설명 ______________________________                                | 기본값                                            | 설정 가능한 값                                                                              | 추가된 버전 |
+| 변수명                            | 설명 ________________________________________                      | 기본값                                            | 설정 가능한 값                                                                              | 추가된 버전 |
 |-----------------------------------|--------------------------------------------------------------------|---------------------------------------------------|---------------------------------------------------------------------------------------------|-------------|
 | TZ                                | 컨테이너 타임존                                                    | `UTC`                                             | [TZ Identifiers(식별자)](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) 참고 | 0.1.0       |
 | PUID                              | 서버를 실행할 유저의 UID (`id -u` 명령어로 확인 가능)              | `1000`                                            | 1~                                                                                          | 0.1.0       |
 | PGID                              | 서버를 실행할 그룹의 GID (`id -g` 명령어로 확인 가능)              | `1000`                                            | 1~                                                                                          | 0.1.0       |
 | REPO_URL                          | 설치할 서버의 URL                                                  | `https://github.com/jh1950/generative_agents`     | 원본 프로젝트 및 포크된 버전의 URL                                                          | 0.4.0       |
+| _**[AUTO_UPDATE](#auto_update)**_ | 서버 실행 전 서버 업데이트 확인 및 진행                            | `false`                                           | boolean                                                                                     | 0.2.0       |
 | FRONTEND_ROOT                     | 프론트엔드 루트 경로                                               | `environment/frontend_server`                     | `path`, `./path`, `/path`                                                                   | 0.4.0       |
 | CONFIG_FILE                       | 프론트엔드 설정 파일 경로 (프론트엔드 루트 기준)                   | any1/any2.py, any1/any2/local.py인 경우 자동 탐지 | `path/file.py`, `./path/file.py`, `/path/file.py`                                           | 0.4.0       |
-| _**[AUTO_UPDATE](#auto_update)**_ | 서버 실행 전 서버 업데이트 확인 및 진행                            | `false`                                           | boolean                                                                                     | 0.2.0       |
 | SYNC_TZ                           | 프론트엔드 타임존을 컨테이너 타임존과 동기화                       | `true`                                            | boolean                                                                                     | 0.3.1       |
 | ALLOWED_HOSTS\*                   | 프론트엔드 접속 허용 IP를 설정 (쉼표로 구분하여 여러 값 설정 가능) | 컨테이너 내부 IP                                  | `IP`, `IP, Domain, ...`, `manual`                                                           | 0.1.0       |
+| BACKEND_ROOT                      | 백엔드 루트 경로                                                   | `reverie/backend_server`                          | `path`, `./path`, `/path`                                                                   | 0.5.0       |
+| CUSTOM_UTILS                      | 커스텀 `utils.py` 파일 사용 (`BACKEND_ROOT` 폴더 내 직접 생성)     | false                                             | boolean                                                                                     | 0.5.0       |
+| OPENAI_API_KEY                    | OpenAI API Key, (`CUSTOM_UTILS` 값이 `false`일 경우 사용)          | -                                                 | `string`                                                                                    | 0.5.0       |
+| OPENAI_API_OWNER                  | OpenAI API Key 소유자 (`CUSTOM_UTILS` 값이 `false`일 경우 사용)    | -                                                 | `string`                                                                                    | 0.5.0       |
 
 \* `ALLOWED_HOSTS` 값을 `manual`로 설정 시 `environment/frontend_server/config/settings/local.py` 파일에서 직접 설정할 수 있습니다.
 
@@ -134,4 +138,23 @@ git stash list # stash@{0}, stash@{1} 형식의 name 확인
 git stash apply name
 # git stash drop name # 임시 저장 제거
 # git stash clear # 임시 저장 모두 제거
+```
+
+
+## 웹 접속
+
+> [!TIP]
+> `docker exec generative_agents hostname -i`
+> 명령어로 컨테이너 IP를 확인할 수 있습니다.
+
+만약 컨테이너 포트 연결을 `8001:8000`로 설정했다면 다음과 같은 방법으로 접속합니다.
+
+ 1. <http://localhost:8001>
+ 2. <http://컨테이너IP:8000>
+
+
+## 백엔드 실행
+
+```bash
+docker exec -it generative_agents backend # or reverie
 ```

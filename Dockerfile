@@ -15,10 +15,15 @@ RUN apt-get update -y \
  && rm -rf /var/lib/apt/lists/* \
  && useradd -ms /bin/bash user
 
-COPY --chmod=755 ./scripts /scripts
-RUN for file in shell venv django-shell; do \
+COPY ./scripts /scripts
+RUN chmod 755 /scripts/*.sh \
+ && for file in shell venv django-shell; do \
         cp /scripts/connect-copy.sh /usr/local/bin/"$file"; \
     done \
+ && for file in backend reverie; do \
+        cp /scripts/backend.sh /usr/local/bin/"$file"; \
+    done \
+ && rm /scripts/connect-copy.sh /scripts/backend.sh \
  && chown -R user:user /scripts
 
 WORKDIR /scripts
@@ -27,12 +32,15 @@ ENV TZ="UTC" \
     PUID=1000 \
     PGID=1000 \
     REPO_URL="https://github.com/jh1950/generative_agents" \
-    FRONTEND_ROOT="environment/frontend_server" \
-    BACKEND_ROOT="reverie/backend_server" \
-    CONFIG_FILE="" \
     AUTO_UPDATE=false \
+    FRONTEND_ROOT="environment/frontend_server" \
+    CONFIG_FILE="" \
     SYNC_TZ=true \
-    ALLOWED_HOSTS=""
+    ALLOWED_HOSTS="" \
+    BACKEND_ROOT="reverie/backend_server" \
+    CUSTOM_UTILS=false \
+    OPENAI_API_KEY="" \
+    OPENAI_API_OWNER=""
 
 HEALTHCHECK \
     --timeout=5s \
