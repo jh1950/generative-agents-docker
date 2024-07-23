@@ -17,7 +17,7 @@
 [![Linting](https://github.com/jh1950/generative-agents-docker/actions/workflows/linting.yml/badge.svg)](https://github.com/jh1950/generative-agents-docker/actions/workflows/linting.yml)
 
 [![Docker Hub](https://img.shields.io/badge/Docker-Hub-blue?logo=docker)](https://hub.docker.com/r/jh1950/generative-agents-docker)
-[![GHCR](https://img.shields.io/badge/GHCR-Package-blue?logo=docker)](https://github.com/jh1950/generative-agents-docker/pkgs/container/generative-agents-docker)
+[![GHCR](https://img.shields.io/badge/GHCR-Package-blue?logo=github)](https://github.com/jh1950/generative-agents-docker/pkgs/container/generative-agents-docker)
 
 [jh1950/generative_agents](https://github.com/jh1950/generative_agents)
 전용 컨테이너로 만들기 시작했으며, 현재는 원본 프로젝트인
@@ -81,8 +81,8 @@ docker compose logs
 가상환경이 적용된 Bash
 
 ```bash
-docker exec -it --user user generative_agents bash # 0.1.0 ~
-# or docker exec -it generative_agents shell
+docker exec -it --user user generative_agents bash # v0.1.0 ~
+# or docker exec -it generative_agents shell # v0.4.0 ~
 ```
 
 ### Python
@@ -90,7 +90,7 @@ docker exec -it --user user generative_agents bash # 0.1.0 ~
 Interactive 모드로, 프론트엔드인 Django 서버와 연결됩니다.
 
 ```bash
-docker exec -it generative_agents venv
+docker exec -it generative_agents venv # v0.4.0 ~
 ```
 
 

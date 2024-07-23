@@ -7,7 +7,7 @@ on:  # yamllint disable-line rule:truthy
     paths:
       - "README.md"
 
-run-name: README Update
+run-name: Update Docker Hub Description
 
 jobs:
   Publish:
