@@ -70,10 +70,3 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           push: true
           provenance: false
-
-      - name: Docker Hub Description
-        uses: peter-evans/dockerhub-description@v4
-        with:
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-          repository: ${{ github.repository }}

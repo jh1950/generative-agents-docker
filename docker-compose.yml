@@ -10,6 +10,10 @@ services:
       TZ: "Asia/Seoul"
       PUID: 1000
       PGID: 1000
+      SYNC_TZ: true
       ALLOWED_HOSTS: "*"
+      CUSTOM_UTILS: false  # Manually create data/BACKEND_ROOT/utils.py if true
+      OPENAI_API_KEY: "OpenAI-API-KEY"  # Use if CUSTOM_UTILS is false
+      OPENAI_API_OWNER: "OpenAI-API-OWNER"  # Use if CUSTOM_UTILS is false
     volumes:
       - ./data:/data
