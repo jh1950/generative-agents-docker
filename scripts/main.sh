@@ -8,11 +8,11 @@ if [ "$IMAGE_VERSION" == "dev" ]; then
 	WARNING "The container is using the dev version"
 else
 	LATEST_VERSION=$(curl "$REPO_API/releases/latest" -s | jq .name -r)
-	if [ "$IMAGE_VERSION" != "$LATEST_VERSION" ]; then
+	if [ "${IMAGE_VERSION#v}" != "${LATEST_VERSION#v}" ]; then
 		IMPORTANT "Latest Release: $LATEST_VERSION"
 	fi
 fi
-if [ -z "$LATEST_VERSION" ] || [ "$IMAGE_VERSION" != "$LATEST_VERSION" ]; then
+if [ -z "$LATEST_VERSION" ] || [ "${IMAGE_VERSION#v}" != "${LATEST_VERSION#v}" ]; then
 	INFO "Run: docker pull jh1950/generative-agents-docker:latest"
 	INFO "And Restarting the Container"
 fi
