@@ -28,7 +28,7 @@ RUN chmod 755 /scripts/*.sh \
 
 WORKDIR /scripts
 
-ARG IMAGE_VERSION="unknown"
+ARG VERSION="unknown"
 ENV TZ="UTC" \
     PUID=1000 \
     PGID=1000 \
@@ -40,7 +40,7 @@ ENV TZ="UTC" \
     ALLOWED_HOSTS="" \
     BACKEND_ROOT="reverie/backend_server" \
     CUSTOM_UTILS=false \
-    IMAGE_VERSION=$IMAGE_VERSION
+    IMAGE_VERSION=$VERSION
 
 HEALTHCHECK \
     --timeout=5s \
