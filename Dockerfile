@@ -28,6 +28,7 @@ RUN chmod 755 /scripts/*.sh \
 
 WORKDIR /scripts
 
+ARG IMAGE_VERSION="unknown"
 ENV TZ="UTC" \
     PUID=1000 \
     PGID=1000 \
@@ -39,8 +40,7 @@ ENV TZ="UTC" \
     ALLOWED_HOSTS="" \
     BACKEND_ROOT="reverie/backend_server" \
     CUSTOM_UTILS=false \
-    OPENAI_API_KEY="" \
-    OPENAI_API_OWNER=""
+    IMAGE_VERSION=$IMAGE_VERSION
 
 HEALTHCHECK \
     --timeout=5s \

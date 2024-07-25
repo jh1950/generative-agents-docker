@@ -3,6 +3,21 @@
 source "/scripts/functions.sh"
 
 
+# Docker Image Version Check
+if [ "$IMAGE_VERSION" == "dev" ]; then
+	WARNING "The container is using the dev version"
+else
+	LATEST_VERSION=$(curl "$REPO_API/releases/latest" -s | jq .name -r)
+	if [ "$IMAGE_VERSION" != "$LATEST_VERSION" ]; then
+		IMPORTANT "Latest Release: $LATEST_VERSION"
+	fi
+fi
+if [ -z "$LATEST_VERSION" ] || [ "$IMAGE_VERSION" != "$LATEST_VERSION" ]; then
+	INFO "Run: docker pull jh1950/generative-agents-docker:latest"
+	INFO "And Restarting the Container"
+fi
+
+
 # Repository URL Check
 ACTION "URL Checking..."
 INFO "URL: $REPO_URL"
@@ -42,15 +57,16 @@ fi
 
 
 # VENV Install
-if [ ! -d "$VENV_DIR/bin" ]; then
+if [ ! -f "$VENV_DIR/.installed" ]; then
 	ACTION "Starting VENV Creation"
 	python3 -m venv "$VENV_DIR"
 fi
+touch "$VENV_DIR/.installed"
 echo "source $VENV_DIR/bin/activate" >> ~/.bashrc
 
 
 # VENV Module Update
-SHASUM="$(cat "$VENV_DIR/.installed" 2> /dev/null)"
+SHASUM="$(cat "$VENV_DIR/.installed")"
 if ! echo "$SHASUM" "$DATA_DIR/requirements.txt" | sha256sum -c - > /dev/null 2>&1; then
 	ACTION "Starting Module Update"
 	$PIP install -U pip
