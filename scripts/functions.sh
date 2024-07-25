@@ -66,7 +66,7 @@ LOG_WITHOUT_NEWLINE() {
 
 GET_REPO_IN_URL() {
 	local url="$1"
-	awk -F ':|/' '{print $(NF-1) "/" $NF}' <<< "$url"
+	awk -F "://|@|:|/" '{print $3 "/" $4}' <<< "$url"
 }
 
 FIND_CONFIG_FILE() {
