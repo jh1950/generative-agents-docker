@@ -1,5 +1,15 @@
 #!/bin/bash
 
+
+# simple function
+
+join() {
+	local IFS="$1"
+	shift
+	echo "$*"
+}
+
+
 # Beautiful Logs
 
 RESET=0

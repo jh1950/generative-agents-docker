@@ -36,7 +36,10 @@ su user -c ./main.sh &
 wait "$!"
 
 
-ACTION "Waiting for Backend to end..."
-while backs="$(pgrep -f reverie.py)"; do
-	tail -f --pid="$(echo "$backs" | tail -1)"
-done
+mapfile -t backs < <(pgrep -f reverie.py)
+if [ "${#backs[@]}" -ne 0 ]; then
+	ACTION "Waiting for Backend to end..."
+	for back in "${backs[@]}"; do
+		tail -f --pid="$back" 2> /dev/null
+	done
+fi

@@ -34,6 +34,7 @@ ENV TZ="UTC" \
     PGID=1000 \
     REPO_URL="https://github.com/jh1950/generative_agents" \
     AUTO_UPDATE=false \
+    REQUIREMENTS="requirements.txt" \
     FRONTEND_ROOT="environment/frontend_server" \
     CONFIG_FILE="" \
     SYNC_TZ=true \

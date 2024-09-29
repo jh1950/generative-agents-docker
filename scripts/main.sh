@@ -18,39 +18,45 @@ if [ -z "$LATEST_VERSION" ] || [ "${IMAGE_VERSION#v}" != "${LATEST_VERSION#v}" ]
 fi
 
 
-# Repository URL Check
-ACTION "URL Checking..."
-INFO "URL: $REPO_URL"
-status="$(curl -sfSL -o /dev/null -w "%{http_code}" "$REPO_URL")"
-if [ "$status" -ne 200 ]; then
-	ERROR "Invalid URL: $REPO_URL"
-	exit 1
+if [ -z "$REPO_URL" ]; then
+	ACTION "Use a local files because REPO_URL is not set"
+else
+	# Repository URL Check
+	ACTION "URL Checking..."
+	INFO "URL: $REPO_URL"
+	status="$(curl -sfSL -o /dev/null -w "%{http_code}" "$REPO_URL")"
+	if [ "$status" -ne 200 ]; then
+		ERROR "Invalid URL: $REPO_URL"
+		exit 1
+	fi
 fi
 
 
-# Server Install/Update
 cd "$DATA_DIR" || exit 1
-if [ ! -d "$DATA_DIR/.git" ]; then
-	ACTION "Starting Server Installation"
-	git init
-	git remote add origin "$REPO_URL"
-	git fetch origin main
-	git checkout main
-elif [ "$AUTO_UPDATE" = true ]; then
-	INSTALLED_URL="$(git config remote.origin.url)"
-	INSTALLED_REPO="$(GET_REPO_IN_URL "$INSTALLED_URL")"
-	SET_REPO="$(GET_REPO_IN_URL "$REPO_URL")"
-	if [ "$INSTALLED_REPO" != "$SET_REPO" ]; then
-		INFO "Installed URL: $INSTALLED_URL"
-		ERROR "The URL and the installed server do not match, so the update cannot checked."
-	else
-		CURRENT_COMMIT=$(git log HEAD -1 --format=format:%H)
-		LATEST_COMMIT=$(curl -sfSL "$REPO_API/commits/main" | jq .sha -r)
-		if [ "$CURRENT_COMMIT" != "$LATEST_COMMIT" ]; then
-			ACTION "Starting Server Update"
-			git stash save "$(date "+%F %T")"
-			git fetch origin main
-			git pull origin main
+if [ -n "$REPO_URL" ]; then
+	# Server Install/Update
+	if [ ! -d "$DATA_DIR/.git" ]; then
+		ACTION "Starting Server Installation"
+		git init
+		git remote add origin "$REPO_URL"
+		git fetch origin main
+		git checkout main
+	elif [ "$AUTO_UPDATE" = true ]; then
+		INSTALLED_URL="$(git config remote.origin.url)"
+		INSTALLED_REPO="$(GET_REPO_IN_URL "$INSTALLED_URL")"
+		SET_REPO="$(GET_REPO_IN_URL "$REPO_URL")"
+		if [ "$INSTALLED_REPO" != "$SET_REPO" ]; then
+			INFO "Installed URL: $INSTALLED_URL"
+			ERROR "The URL and the installed server do not match, so the update cannot checked."
+		else
+			CURRENT_COMMIT=$(git log HEAD -1 --format=format:%H)
+			LATEST_COMMIT=$(curl -sfSL "$REPO_API/commits/main" | jq .sha -r)
+			if [ "$CURRENT_COMMIT" != "$LATEST_COMMIT" ]; then
+				ACTION "Starting Server Update"
+				git stash save "$(date "+%F %T")"
+				git fetch origin main
+				git pull origin main
+			fi
 		fi
 	fi
 fi
@@ -67,14 +73,14 @@ echo "source $VENV_DIR/bin/activate" >> ~/.bashrc
 
 # VENV Module Update
 SHASUM="$(cat "$VENV_DIR/.installed")"
-if ! echo "$SHASUM" "$DATA_DIR/requirements.txt" | sha256sum -c - > /dev/null 2>&1; then
+if ! echo "$SHASUM" "$REQUIREMENTS_FILE" | sha256sum -c - > /dev/null 2>&1; then
 	ACTION "Starting Module Update"
 	$PIP install -U pip
-	if ! $PIP install -Ur "$DATA_DIR/requirements.txt"; then
+	if ! $PIP install -Ur "$REQUIREMENTS_FILE"; then
 		ERROR "Update Error"
 		exit 1
 	fi
-	sha256sum "$DATA_DIR/requirements.txt" | awk '{print $1}' > "$VENV_DIR/.installed"
+	sha256sum "$REQUIREMENTS_FILE" | awk '{print $1}' > "$VENV_DIR/.installed"
 fi
 
 
