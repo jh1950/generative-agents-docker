@@ -34,16 +34,18 @@ if [ "$CUSTOM_UTILS" = false ]; then
 		while [ -z "$OPENAI_API_KEY" ]; do
 			printf "Your OpenAP API Key : "
 			read -r OPENAI_API_KEY
-			export OPENAI_API_KEY="$(xargs <<< "$OPENAI_API_KEY")"
+			OPENAI_API_KEY="$(xargs <<< "$OPENAI_API_KEY")"
 		done
+		export OPENAI_API_KEY
 	fi
 	if [ -z "$OPENAI_API_OWNER" ]; then
 		IMPORTANT "To skip this step, set env OPENAI_API_OWNER"
 		while [ -z "$OPENAI_API_OWNER" ]; do
 			printf "Your OpenAP API Owner : "
 			read -r OPENAI_API_OWNER
-			export OPENAI_API_OWNER="$(xargs <<< "$OPENAI_API_OWNER")"
+			OPENAI_API_OWNER="$(xargs <<< "$OPENAI_API_OWNER")"
 		done
+		export OPENAI_API_OWNER
 	fi
 fi
 

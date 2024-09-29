@@ -10,7 +10,7 @@ on:  # yamllint disable-line rule:truthy
 run-name: Update Docker Hub Description
 
 jobs:
-  Publish:
+  Description:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
