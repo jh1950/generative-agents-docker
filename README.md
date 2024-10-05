@@ -1,4 +1,4 @@
-# Generative Agents 전용 컨테이너
+# [Generative Agents](https://github.com/joonspk-research/generative_agents) 전용 컨테이너
 
 > [!NOTE]
 > 이 소스코드는 [MIT 라이선스](https://github.com/jh1950/generative-agents-docker/blob/main/LICENSE)를 따르지만,
@@ -20,9 +20,10 @@
 [![GHCR](https://img.shields.io/badge/GHCR-Package-blue?logo=github)](https://github.com/jh1950/generative-agents-docker/pkgs/container/generative-agents-docker)
 
 [jh1950/generative_agents](https://github.com/jh1950/generative_agents)
-전용 컨테이너로 만들기 시작했으며, 현재는 원본 프로젝트인
+전용으로 만들기 시작했으나, v0.4.0 부터 원본 프로젝트인
 [joonspk-research/generative_agents](https://github.com/joonspk-research/generative_agents)
-와 다른 포크된 버전도 사용할 수 있습니다.
+를 포함하여 다른 포크된 버전도 사용할 수 있습니다.
+
 
 
 ## 이미지 설치
@@ -32,6 +33,7 @@
 ```bash
 docker pull jh1950/generative-agents-docker:latest
 ```
+
 
 
 ## 컨테이너 실행
@@ -47,6 +49,7 @@ docker compose up -d
 ```
 
 
+
 ## 컨테이너 중지
 
 실행된 컨테이너는 시스템이 부팅될 때마다 자동으로 컨테이너가 다시 실행됩니다.
@@ -58,6 +61,7 @@ docker compose down
 ```
 
 
+
 ## 컨테이너 로그
 
 > [!TIP]
@@ -67,6 +71,7 @@ docker compose down
 docker compose logs
 # or docker logs generative_agents
 ```
+
 
 
 ## 컨테이너 접속
@@ -94,6 +99,7 @@ docker exec -it generative_agents venv # v0.4.0 ~
 ```
 
 
+
 ## 환경 변수
 
 > [!NOTE]
@@ -111,17 +117,18 @@ docker exec -it generative_agents venv # v0.4.0 ~
 | PGID                              | 서버를 실행할 그룹의 GID (`id -g` 명령어로 확인 가능)              | `1000`                                            | 1~                                                                                          | 0.1.0       |
 | REPO_URL\*                        | 설치할 서버의 URL                                                  | `https://github.com/jh1950/generative_agents`     | "", 원본 프로젝트 및 포크된 버전의 URL                                                      | 0.4.0       |
 | _**[AUTO_UPDATE](#auto_update)**_ | 서버 실행 전 서버 업데이트 확인 및 진행                            | `false`                                           | boolean                                                                                     | 0.2.0       |
-| REQUIREMENTS                      | `requirements.txt` 파일 위치                                       | "requirements.txt"                                | `path`, `./to`, `/file`                                                                     | 0.6.0       |
-| FRONTEND_ROOT                     | 프론트엔드 디렉토리 위치                                           | `environment/frontend_server`                     | `path`, `./to`, `/dir`                                                                      | 0.4.0       |
-| CONFIG_FILE                       | 프론트엔드 설정 파일 위치 (프론트엔드 기준)                        | any1/any2.py, any1/any2/local.py인 경우 자동 탐지 | `path`, `./to`, `/file`                                                                     | 0.4.0       |
+| REQUIREMENTS                      | `requirements.txt` 파일 위치 (`DATA_DIR` 기준)                     | `requirements.txt`                                | `path`, `./to`, `/file`                                                                     | 0.6.0       |
+| FRONTEND_ROOT                     | 프론트엔드 디렉토리 위치 (`DATA_DIR` 기준)                         | `environment/frontend_server`                     | `path`, `./to`, `/dir`                                                                      | 0.4.0       |
+| CONFIG_FILE                       | 프론트엔드 설정 파일 위치 (`FRONTEND_ROOT` 기준)                   | any1/any2.py, any1/any2/local.py인 경우 자동 탐지 | `path`, `./to`, `/file`                                                                     | 0.4.0       |
 | SYNC_TZ                           | 프론트엔드 타임존을 컨테이너 타임존과 동기화                       | `true`                                            | boolean                                                                                     | 0.3.1       |
 | ALLOWED_HOSTS\*\*                 | 프론트엔드 접속 허용 IP를 설정 (쉼표로 구분하여 여러 값 설정 가능) | [컨테이너 내부 IP](#웹-접속)                      | `IP`, `IP, Domain, ...`, `manual`                                                           | 0.1.0       |
-| BACKEND_ROOT                      | 백엔드 디렉토리 위치                                               | `reverie/backend_server`                          | `path`, `./to`, `/dir`                                                                      | 0.5.0       |
+| BACKEND_ROOT                      | 백엔드 디렉토리 위치 (`DATA_DIR` 기준)                             | `reverie/backend_server`                          | `path`, `./to`, `/dir`                                                                      | 0.5.0       |
 | CUSTOM_UTILS                      | 커스텀 `utils.py` 파일 사용 (`BACKEND_ROOT` 폴더 내 직접 생성)     | `false`                                           | boolean                                                                                     | 0.5.0       |
 | OPENAI_API_KEY                    | OpenAI API Key, (`CUSTOM_UTILS` 값이 `false`일 경우 사용)          | -                                                 | `string`                                                                                    | 0.5.0       |
 | OPENAI_API_OWNER                  | OpenAI API Key 소유자 (`CUSTOM_UTILS` 값이 `false`일 경우 사용)    | -                                                 | `string`                                                                                    | 0.5.0       |
 
 \* 빈 값 설정 시 별도의 설치 없이 마운트된 디렉토리로 서버를 실행합니다.
+
 \*\* `manual` 설정 시 `environment/frontend_server/config/settings/local.py` 파일에서 직접 설정할 수 있습니다.
 
 ### AUTO_UPDATE
@@ -145,6 +152,7 @@ git stash apply name
 ```
 
 
+
 ## 웹 접속
 
 > [!TIP]
@@ -155,6 +163,7 @@ git stash apply name
 
  1. <http://localhost:8001>
  2. <http://컨테이너_내부_IP:8000>
+
 
 
 ## 백엔드 실행
