@@ -1,7 +1,7 @@
 // https://github.com/DavidAnson/markdownlint/blob/main/schema/.markdownlint.jsonc
 {
 	"MD012": {
-		"maximum": 2
+		"maximum": 3
 	},
 	"MD013": {
 		"line_length": 120,
