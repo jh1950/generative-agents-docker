@@ -4,6 +4,7 @@ source "/scripts/variables.sh"
 source "/scripts/functions.sh"
 
 
+
 args=()
 while [ "${#@}" -ne 0 ]; do
 	case "$1" in
@@ -18,6 +19,7 @@ while [ "${#@}" -ne 0 ]; do
 	esac
 	shift
 done
+
 
 
 if [ "$BACKGROUND" == "&" ] && [ "${#args[@]}" -lt 3 ]; then
@@ -49,6 +51,8 @@ if [ "$CUSTOM_UTILS" = false ]; then
 	fi
 fi
 
+
+
 cd "$BACKEND_DIR" || exit 1
 ACTION "Back-end has been Started"
 if [ "$BACKGROUND" != "&" ]; then
@@ -57,8 +61,8 @@ if [ "$BACKGROUND" != "&" ]; then
 fi
 
 if [ "${#args[@]}" -ge 3 ]; then
-	USER_RUN "$PYTHON" reverie.py "<<<" "\"$(join $'\n' "${args[@]}")\"" "$BACKGROUND"
+	USER_RUN "$PYTHON" reverie.py "<<<" "\"$(JOIN $'\n' "${args[@]}")\"" "$BACKGROUND"
 else
 	USER_RUN "$PYTHON" reverie.py
+	ACTION "Back-end is Stopped"
 fi
-ACTION "Back-end is Stopped"

@@ -4,6 +4,7 @@ source "/scripts/variables.sh"
 source "/scripts/functions.sh"
 
 
+
 mode="${1,,}"
 case "$mode" in
 	shell)

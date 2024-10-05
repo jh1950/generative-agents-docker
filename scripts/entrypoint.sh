@@ -3,7 +3,6 @@
 source "/scripts/variables.sh"
 source "/scripts/functions.sh"
 
-
 if [ "$EUID" -ne 0 ]; then
 	ERROR "Please run it as a root user!"
 	exit 1
@@ -16,13 +15,15 @@ elif [ ! -d "$DATA_DIR" ]; then
 fi
 
 
+
 ACTION "Change UID/PID"
-INFO "User UID: ${PUID}"
-INFO "User GID: ${PGID}"
+INFO "User UID: $PUID"
+INFO "User GID: $PGID"
 mkdir -p "$VENV_DIR"
-usermod -o -u "${PUID}" user > /dev/null 2>&1
-groupmod -o -g "${PGID}" user > /dev/null 2>&1
-chown -R user:user "$DATA_DIR" "$VENV_DIR" /home/user /scripts
+usermod -o -u "$PUID" user > /dev/null 2>&1
+groupmod -o -g "$PGID" user > /dev/null 2>&1
+chown -R "$PUID":"$PGID" "$DATA_DIR" "$VENV_DIR" /home/user /scripts
+
 
 
 server_down() {
@@ -32,8 +33,10 @@ server_down() {
 trap "server_down" 15
 
 
+
 su user -c ./main.sh &
 wait "$!"
+
 
 
 mapfile -t backs < <(pgrep -f reverie.py)

@@ -2,12 +2,15 @@
 
 source "/scripts/functions.sh"
 
+cd "$DATA_DIR" || exit 1
+
+
 
 # Docker Image Version Check
 if [ "$IMAGE_VERSION" == "dev" ]; then
 	WARNING "The container is using the dev version"
 else
-	LATEST_VERSION=$(curl "$REPO_API/releases/latest" -s | jq .name -r)
+	LATEST_VERSION=$(curl "https://api.github.com/repos/jh1950/generative-agents-docker/releases/latest" -s | jq .name -r)
 	if [ "${IMAGE_VERSION#v}" != "${LATEST_VERSION#v}" ]; then
 		IMPORTANT "Latest Release: $LATEST_VERSION"
 	fi
@@ -18,8 +21,9 @@ if [ -z "$LATEST_VERSION" ] || [ "${IMAGE_VERSION#v}" != "${LATEST_VERSION#v}" ]
 fi
 
 
+
 if [ -z "$REPO_URL" ]; then
-	ACTION "Use a local files because REPO_URL is not set"
+	IMPORTANT "Use a local files because REPO_URL is not set"
 else
 	# Repository URL Check
 	ACTION "URL Checking..."
@@ -29,11 +33,7 @@ else
 		ERROR "Invalid URL: $REPO_URL"
 		exit 1
 	fi
-fi
 
-
-cd "$DATA_DIR" || exit 1
-if [ -n "$REPO_URL" ]; then
 	# Server Install/Update
 	if [ ! -d "$DATA_DIR/.git" ]; then
 		ACTION "Starting Server Installation"
@@ -60,6 +60,7 @@ if [ -n "$REPO_URL" ]; then
 		fi
 	fi
 fi
+CONFIG_PATH="$(FIND_CONFIG_FILE)"
 
 
 # VENV Install
@@ -71,37 +72,50 @@ touch "$VENV_DIR/.installed"
 echo "source $VENV_DIR/bin/activate" >> ~/.bashrc
 
 
+
 # VENV Module Update
-SHASUM="$(cat "$VENV_DIR/.installed")"
-if ! echo "$SHASUM" "$REQUIREMENTS_FILE" | sha256sum -c - > /dev/null 2>&1; then
-	ACTION "Starting Module Update"
-	$PIP install -U pip
-	if ! $PIP install -Ur "$REQUIREMENTS_FILE"; then
-		ERROR "Update Error"
-		exit 1
+if [ ! -f "$REQUIREMENTS_FILE" ]; then
+	WARNING "Not found: $REQUIREMENTS_FILE"
+else
+	SHASUM="$(cat "$VENV_DIR/.installed")"
+	if ! echo "$SHASUM" "$REQUIREMENTS_FILE" | sha256sum -c - > /dev/null 2>&1; then
+		ACTION "Starting Module Update"
+		$PIP install -U pip
+		if ! $PIP install -Ur "$REQUIREMENTS_FILE"; then
+			ERROR "Update Error"
+			exit 1
+		fi
+		sha256sum "$REQUIREMENTS_FILE" | awk '{print $1}' > "$VENV_DIR/.installed"
 	fi
-	sha256sum "$REQUIREMENTS_FILE" | awk '{print $1}' > "$VENV_DIR/.installed"
 fi
+
 
 
 # Server Setting
 cd "$FRONTEND_DIR" || exit 1
 
+ACTION "Front-end Setting"
+
 if [ "$SYNC_TZ" = true ]; then
-	DJANGO_CONFIG_SETTING TIME_ZONE "\"$TZ\""
+	INFO "TIME_ZONE = \"$TZ\""
+	if ! DJANGO_CONFIG_SETTING TIME_ZONE "\"$TZ\"" "$CONFIG_PATH"; then
+		WARNING "Failed: Not found: $CONFIG_PATH"
+	fi
 fi
 
 if [ "$ALLOWED_HOSTS" != "manual" ]; then
-	ACTION "Change Setting"
 	test -z "$ALLOWED_HOSTS" && ALLOWED_HOSTS="$(hostname -i)"
 	HOSTS="[$(echo "\"$ALLOWED_HOSTS\"" | sed -E "s/,[[:blank:]]/,/g; s/[[:blank:]],/,/g; s/,,?+/,/g; s/,/\", \"/g")]"
 	INFO "ALLOWED_HOSTS = $HOSTS"
-	DJANGO_CONFIG_SETTING ALLOWED_HOSTS "$HOSTS"
+	if ! DJANGO_CONFIG_SETTING ALLOWED_HOSTS "$HOSTS" "$CONFIG_PATH"; then
+		WARNING "Failed: Not found: $CONFIG_PATH"
+	fi
 fi
 
 if [ "$CUSTOM_UTILS" = false ]; then
 	cp /scripts/utils.py "$BACKEND_DIR/utils.py"
 fi
+
 
 
 # Front-end Start

@@ -1,14 +1,6 @@
 #!/bin/bash
 
 
-# simple function
-
-join() {
-	local IFS="$1"
-	shift
-	echo "$*"
-}
-
 
 # Beautiful Logs
 
@@ -25,7 +17,6 @@ WHITE=37
 BOLD=true
 BLIGHT=false
 NEWLINE=true
-
 
 ERROR() {
 	LOG "$*" "$RED"
@@ -74,38 +65,53 @@ LOG_WITHOUT_NEWLINE() {
 }
 
 
+
+# Functions
+
+JOIN() {
+	local IFS="$1"
+	shift
+	echo "$*"
+}
+
 GET_REPO_IN_URL() {
 	local url="$1"
 	awk -F "://|@|:|/" '{print $3 "/" $4}' <<< "$url"
 }
 
 FIND_CONFIG_FILE() {
-	local CONFIG_DIR
+	local TMP
 
-	if [ -z "$CONFIG_FILE" ]; then
-		CONFIG_DIR="$(grep "os.environ.setdefault" "$FRONTEND_DIR/manage.py" | awk -F "'|)" '{print $4}' | tr "." "/")"
-		if [ ! -d "$CONFIG_DIR" ]; then
-			CONFIG_FILE="${CONFIG_DIR}.py"
+	TMP="$CONFIG_FILE"
+	if [ -z "$TMP" ]; then
+		TMP="$(grep "os.environ.setdefault" "$FRONTEND_DIR/manage.py" | awk -F "'|)" '{print $4}' | tr "." "/")"
+		if [ -d "$FRONTEND_DIR/$TMP" ]; then
+			TMP="$TMP/local.py"
 		else
-			CONFIG_FILE="$CONFIG_DIR/local.py"
+			TMP="$TMP.py"
 		fi
 	fi
 
-	echo "$FRONTEND_DIR/$CONFIG_FILE"
+	echo "$FRONTEND_DIR/$TMP"
 }
 
 # Don't use settings that span multiple lines like INSTALLED_APPS, MIDDLEWARE
 DJANGO_CONFIG_SETTING() {
 	local key="$1"
 	local val="$2"
+	local file="$3"
 	local full="$key = $val"
-	local CONFIG_FILE
 
-	CONFIG_FILE="$(FIND_CONFIG_FILE)"
-	if grep -q ^"$key.*=" "$CONFIG_FILE"; then
-		sed -i "s/^$key.*/${full//\//\\\/}/g" "$CONFIG_FILE"
+	if [ -z "$file" ]; then
+		file="$(FIND_CONFIG_FILE)"
+	fi
+	if [ ! -f "$file" ]; then
+		return 1
+	fi
+	if grep -q ^"$key.*=" "$file"; then
+		sed -i "s/^$key.*/${full//\//\\\/}/g" "$file"
 	else
-		echo "$full" >> "$CONFIG_FILE"
+		echo "$full" >> "$file"
 	fi
 }
 
