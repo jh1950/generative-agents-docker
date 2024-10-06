@@ -22,7 +22,11 @@ INFO "User GID: $PGID"
 mkdir -p "$VENV_DIR"
 usermod -o -u "$PUID" user > /dev/null 2>&1
 groupmod -o -g "$PGID" user > /dev/null 2>&1
-chown -R "$PUID":"$PGID" "$DATA_DIR" "$VENV_DIR" /home/user /scripts
+chown -R "$PUID":"$PGID" "$DATA_DIR" /home/user /scripts
+if [ "$PYENV_ENABLED" = true ]; then
+	eval "$(pyenv init -)"
+	chown -R "$PUID":"$PGID" "$PYENV_ROOT"
+fi
 
 
 

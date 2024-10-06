@@ -56,8 +56,10 @@ fi
 cd "$BACKEND_DIR" || exit 1
 ACTION "Back-end has been Started"
 if [ "$BACKGROUND" != "&" ]; then
-	INFO "Press Ctrl+c to exit, double press to exit immediately"
-	INFO "Please note that doing so will stop all operations"
+	LOG_WITHOUT_NEWLINE INFO  "Press Ctrl+c to "
+	LOG_WITHOUT_NEWLINE ERROR "force exit"
+	LOG_WITHOUT_NEWLINE INFO  ", double press to exit immediately"
+	echo
 fi
 
 if [ "${#args[@]}" -ge 3 ]; then

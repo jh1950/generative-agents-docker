@@ -21,17 +21,27 @@
 
 [jh1950/generative_agents](https://github.com/jh1950/generative_agents)
 전용으로 만들기 시작했으나, v0.4.0 부터 원본 프로젝트인
-[joonspk-research/generative_agents](https://github.com/joonspk-research/generative_agents)
-를 포함하여 다른 포크된 버전도 사용할 수 있습니다.
+[joonspk-research/generative_agents](https://github.com/joonspk-research/generative_agents)를
+포함하여 다른 포크된 버전도 사용할 수 있습니다.
 
 
 
 ## 이미지 설치
 
+서버의 파이썬 버전이 `3.9.12`인 경우
 아래 명령어를 실행합니다.
 
 ```bash
 docker pull jh1950/generative-agents-docker:latest
+```
+
+### With [pyenv](https://github.com/pyenv/pyenv)
+
+서버의 파이썬 버전이 `3.9.12`가 아닌 경우
+아래 명령어를 실행합니다.
+
+```bash
+docker pull jh1950/generative-agents-docker:pyenv
 ```
 
 
@@ -41,6 +51,8 @@ docker pull jh1950/generative-agents-docker:latest
 컨테이너를 실행하려면 먼저 임의의 폴더를 생성한 후 그 안에
 [docker-compose.yml](https://github.com/jh1950/generative-agents-docker/blob/main/docker-compose.yml)
 파일을 작성하고, 필요한 경우 [환경 변수](#환경-변수)를 수정합니다.
+
+`pyenv` 이미지인 경우 `image` 설정도 수정합니다.
 
 그 후 해당 파일이 위치한 곳에서 아래 명령어를 실행합니다.
 
@@ -60,6 +72,10 @@ docker compose up -d
 docker compose down
 ```
 
+또는 `docker-compose.yml` 파일의
+[restart](https://docs.docker.com/engine/containers/start-containers-automatically/#use-a-restart-policy)
+값을 수정하여 설정을 변경할 수 있습니다.
+
 
 
 ## 컨테이너 로그
@@ -67,9 +83,10 @@ docker compose down
 > [!TIP]
 > 실시간으로 로그를 확인하려면 마지막에 `-f`를 추가합니다.
 
+컨테이너 및 프론트엔드 로그를 보려면 아래 명령어를 실행합니다.
+
 ```bash
-docker compose logs
-# or docker logs generative_agents
+docker logs generative_agents
 ```
 
 
@@ -83,7 +100,7 @@ docker compose logs
 
 ### Bash
 
-가상환경이 적용된 Bash
+가상환경이 적용된 쉘에 연결됩니다.
 
 ```bash
 docker exec -it --user user generative_agents bash # v0.1.0 ~
@@ -103,46 +120,46 @@ docker exec -it generative_agents venv # v0.4.0 ~
 ## 환경 변수
 
 > [!NOTE]
->
 > _**이탤릭체**_: 기본값 사용 권장
 
 [docker-compose.yml](https://github.com/jh1950/generative-agents-docker/blob/main/docker-compose.yml),
 [.env](https://github.com/jh1950/generative-agents-docker/blob/main/.env.example)
 파일에서 설정 가능한 환경 변수 목록입니다.
 
-| 변수명                            | 설명                                                               | 기본값                                            | 설정 가능한 값                                                                              | 추가된 버전 |
-|-----------------------------------|--------------------------------------------------------------------|---------------------------------------------------|---------------------------------------------------------------------------------------------|-------------|
-| TZ                                | 컨테이너 타임존                                                    | `UTC`                                             | [TZ Identifiers(식별자)](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) 참고 | 0.1.0       |
-| PUID                              | 서버를 실행할 유저의 UID (`id -u` 명령어로 확인 가능)              | `1000`                                            | 1~                                                                                          | 0.1.0       |
-| PGID                              | 서버를 실행할 그룹의 GID (`id -g` 명령어로 확인 가능)              | `1000`                                            | 1~                                                                                          | 0.1.0       |
-| REPO_URL\*                        | 설치할 서버의 URL                                                  | `https://github.com/jh1950/generative_agents`     | "", 원본 프로젝트 및 포크된 버전의 URL                                                      | 0.4.0       |
-| _**[AUTO_UPDATE](#auto_update)**_ | 서버 실행 전 서버 업데이트 확인 및 진행                            | `false`                                           | boolean                                                                                     | 0.2.0       |
-| REQUIREMENTS                      | `requirements.txt` 파일 위치 (`DATA_DIR` 기준)                     | `requirements.txt`                                | `path`, `./to`, `/file`                                                                     | 0.6.0       |
-| FRONTEND_ROOT                     | 프론트엔드 디렉토리 위치 (`DATA_DIR` 기준)                         | `environment/frontend_server`                     | `path`, `./to`, `/dir`                                                                      | 0.4.0       |
-| CONFIG_FILE                       | 프론트엔드 설정 파일 위치 (`FRONTEND_ROOT` 기준)                   | any1/any2.py, any1/any2/local.py인 경우 자동 탐지 | `path`, `./to`, `/file`                                                                     | 0.4.0       |
-| SYNC_TZ                           | 프론트엔드 타임존을 컨테이너 타임존과 동기화                       | `true`                                            | boolean                                                                                     | 0.3.1       |
-| ALLOWED_HOSTS\*\*                 | 프론트엔드 접속 허용 IP를 설정 (쉼표로 구분하여 여러 값 설정 가능) | [컨테이너 내부 IP](#웹-접속)                      | `IP`, `IP, Domain, ...`, `manual`                                                           | 0.1.0       |
-| BACKEND_ROOT                      | 백엔드 디렉토리 위치 (`DATA_DIR` 기준)                             | `reverie/backend_server`                          | `path`, `./to`, `/dir`                                                                      | 0.5.0       |
-| CUSTOM_UTILS                      | 커스텀 `utils.py` 파일 사용 (`BACKEND_ROOT` 폴더 내 직접 생성)     | `false`                                           | boolean                                                                                     | 0.5.0       |
-| OPENAI_API_KEY                    | OpenAI API Key, (`CUSTOM_UTILS` 값이 `false`일 경우 사용)          | -                                                 | `string`                                                                                    | 0.5.0       |
-| OPENAI_API_OWNER                  | OpenAI API Key 소유자 (`CUSTOM_UTILS` 값이 `false`일 경우 사용)    | -                                                 | `string`                                                                                    | 0.5.0       |
+| 변수명                            | 설명                                                               | 기본값                                                  | 설정 가능한 값                                                                                   | 추가된 버전 |
+|-----------------------------------|--------------------------------------------------------------------|---------------------------------------------------------|--------------------------------------------------------------------------------------------------|-------------|
+| TZ                                | 컨테이너 타임존                                                    | `UTC`                                                   | [TZ Identifiers(식별자)](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) 참고      | 0.1.0       |
+| PUID                              | 서버를 실행할 유저의 UID (`id -u` 명령어로 확인 가능)              | `1000`                                                  | 1~                                                                                               | 0.1.0       |
+| PGID                              | 서버를 실행할 그룹의 GID (`id -g` 명령어로 확인 가능)              | `1000`                                                  | 1~                                                                                               | 0.1.0       |
+| REPO_URL\*                        | 설치할 서버의 URL                                                  | `https://github.com/joonspk-research/generative_agents` | "", 원본 프로젝트 및 포크된 버전의 URL                                                           | 0.4.0       |
+| _**[AUTO_UPDATE](#auto_update)**_ | 서버 실행 전 서버 업데이트 확인 및 진행                            | `false`                                                 | boolean                                                                                          | 0.2.0       |
+| REQUIREMENTS                      | `requirements.txt` 파일 위치 (`DATA_DIR` 기준)                     | `requirements.txt`                                      | `path`, `./to`, `/file`                                                                          | 0.6.0       |
+| FRONTEND_ROOT                     | 프론트엔드 디렉토리 위치 (`DATA_DIR` 기준)                         | `environment/frontend_server`                           | `path`, `./to`, `/dir`                                                                           | 0.4.0       |
+| CONFIG_FILE                       | 프론트엔드 설정 파일 위치 (`FRONTEND_ROOT` 기준)                   | any1/any2.py, any1/any2/local.py인 경우 자동 탐지       | `path`, `./to`, `/file`                                                                          | 0.4.0       |
+| SYNC_TZ                           | 프론트엔드 타임존을 컨테이너 타임존과 동기화                       | `true`                                                  | boolean                                                                                          | 0.3.1       |
+| ALLOWED_HOSTS\*\*                 | 프론트엔드 접속 허용 IP를 설정 (쉼표로 구분하여 여러 값 설정 가능) | [컨테이너 내부 IP](#웹-접속)                            | `IP`, `IP, Domain, ...`, `manual`                                                                | 0.1.0       |
+| BACKEND_ROOT                      | 백엔드 디렉토리 위치 (`DATA_DIR` 기준)                             | `reverie/backend_server`                                | `path`, `./to`, `/dir`                                                                           | 0.5.0       |
+| CUSTOM_UTILS                      | 커스텀 `utils.py` 파일 사용 (`BACKEND_ROOT` 폴더 내 직접 생성)     | `false`                                                 | boolean                                                                                          | 0.5.0       |
+| OPENAI_API_KEY                    | OpenAI API Key, (`CUSTOM_UTILS` 값이 `false`일 경우 사용)          | -                                                       | `string`                                                                                         | 0.5.0       |
+| OPENAI_API_OWNER                  | OpenAI API Key 소유자 (`CUSTOM_UTILS` 값이 `false`일 경우 사용)    | -                                                       | `string`                                                                                         | 0.5.0       |
+| PYENV_AUTO_UPDATE\*\*\*           | pyenv 버전 자동 업데이트                                           | `true`                                                  | boolean                                                                                          | 1.0.0       |
+| PYTHON_VERSION\*\*\*              | pyenv로 설치할 파이썬 버전                                         | `3.9.12`                                                | [pyenv](https://github.com/pyenv/pyenv/tree/master/plugins/python-build/share/python-build) 참고 | 1.0.0       |
 
 \* 빈 값 설정 시 별도의 설치 없이 마운트된 디렉토리로 서버를 실행합니다.
 
 \*\* `manual` 설정 시 `environment/frontend_server/config/settings/local.py` 파일에서 직접 설정할 수 있습니다.
+
+\*\*\* `pyenv`가 설치된 이미지 전용 환경 변수
 
 ### AUTO_UPDATE
 
 > [!CAUTION]
 > 버전 `0.3.1` 이하에서는 변경된 내용이 **임시저장되지 않습니다**.
 
-<!-- markdownlint-disable-line MD028 -->
-> [!IMPORTANT]
-> 임시 저장된 내용을 복구하기 위해 별도의 **Merge** 작업이 필요할 수 있습니다.
-
 환경 변수 `AUTO_UPDATE` 값을 `true`로 사용할 경우, 업데이트 진행 시 내용이 변경된 파일들은 모두 임시 저장됩니다.
 
 임시 저장된 내용은 아래 명령어로 복구가 가능합니다.
+(별도의 **Merge** 작업이 필요할 수 있습니다.)
 
 ```bash
 git stash list # stash@{0}, stash@{1} 형식의 name 확인
