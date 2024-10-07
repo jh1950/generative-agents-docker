@@ -1,6 +1,7 @@
 ---
 name: Docker Publish
 on:  # yamllint disable-line rule:truthy
+  workflow_dispatch:
   push:
     branches:
       - main
@@ -8,8 +9,6 @@ on:  # yamllint disable-line rule:truthy
       - "Dockerfile"
       - "scripts/*"
   release:
-    branches:
-      - main
     types:
       - published
 

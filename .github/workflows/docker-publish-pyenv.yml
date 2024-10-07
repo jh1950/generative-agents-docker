@@ -1,6 +1,7 @@
 ---
 name: Docker Publish (pyenv)
 on:  # yamllint disable-line rule:truthy
+  workflow_dispatch:
   push:
     branches:
       - main
@@ -72,3 +73,4 @@ jobs:
           provenance: false
           build-args: |
             VERSION=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.version'] }}
+          file: ./Dockerfile-pyenv
