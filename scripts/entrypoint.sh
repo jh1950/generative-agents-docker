@@ -1,5 +1,6 @@
 #!/bin/bash
 
+source "/scripts/major_updates.sh"
 source "/scripts/variables.sh"
 source "/scripts/functions.sh"
 
@@ -9,24 +10,24 @@ if [ "$EUID" -ne 0 ]; then
 elif [ "$PUID" -eq 0 ] || [ "$PGID" -eq 0 ]; then
 	ERROR "PUID/PGID cannot be set to 0."
 	exit 1
-elif [ ! -d "$DATA_DIR" ]; then
-	ERROR "$DATA_DIR is not mounted."
+elif [ ! -d "$VOLUME_ROOT" ]; then
+	ERROR "$VOLUME_ROOT is not mounted."
 	exit 1
 fi
 
 
 
+# pyenv init
+mkdir -p "$PYENV_VERSIONS_SAVE_PATH"
+test -e "$PYENV_ROOT/versions" || ln -s "$PYENV_VERSIONS_SAVE_PATH" "$PYENV_ROOT/versions"
+eval "$(pyenv init -)"
+
 ACTION "Change UID/PID"
 INFO "User UID: $PUID"
 INFO "User GID: $PGID"
-mkdir -p "$VENV_DIR"
 usermod -o -u "$PUID" user > /dev/null 2>&1
 groupmod -o -g "$PGID" user > /dev/null 2>&1
-chown -R "$PUID":"$PGID" "$DATA_DIR" /home/user /scripts
-if [ "$PYENV_ENABLED" = true ]; then
-	eval "$(pyenv init -)"
-	chown -R "$PUID":"$PGID" "$PYENV_ROOT"
-fi
+chown -R "$PUID":"$PGID" "$VOLUME_ROOT" "$PYENV_ROOT" /home/user /scripts
 
 
 

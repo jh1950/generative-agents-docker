@@ -1,21 +1,16 @@
 #!/bin/bash
 
-export PYTHON_VERSION="${PYTHON_VERSION:-"3.9.12"}"
-if [ "$PYENV_ENABLED" = true ]; then
-	VENV_DIR="pyenv-versions"
-	PYTHON_BIN="$PYENV_ROOT/shims"
-	VIRTUAL_NAME="pyenv-$PYTHON_VERSION"
-else
-	VENV_DIR="venv"
-	PYTHON_BIN="$DATA_DIR/$VENV_DIR/bin"
-	VIRTUAL_NAME="venv"
-fi
-export VIRTUAL_NAME
-export VENV_DIR="$DATA_DIR/$VENV_DIR"
-export PYTHON="$PYTHON_BIN/python3"
-export PIP="$PYTHON_BIN/pip3"
+read -a IPs <<< "$(hostname -I)"
+export IPs
 
-export REPO_API="${REPO_URL/github\.com/api.github.com\/repos}"
-export REQUIREMENTS_FILE="$DATA_DIR/$REQUIREMENTS"
-export FRONTEND_DIR="$DATA_DIR/$FRONTEND_ROOT"
-export BACKEND_DIR="$DATA_DIR/$BACKEND_ROOT"
+export PYTHON_VERSION="${PYTHON_VERSION:-"3.9.12"}"
+export VIRTUALENV_NAME="Python-$PYTHON_VERSION"
+export PYENV_VERSIONS_SAVE_PATH="$VOLUME_ROOT/$PYENV_VERSIONS_SAVE_ROOT"
+export PYTHON="$PYENV_ROOT/shims/python3"
+export PIP="$PYENV_ROOT/shims/pip3"
+
+export GITHUB_API="${SERVER_INSTALL_URL/github\.com/api.github.com\/repos}"
+
+export SERVER_REQS_PATH="$VOLUME_ROOT/$SERVER_REQS_TXT"
+export FRONTEND_PATH="$VOLUME_ROOT/$FRONTEND_ROOT"
+export BACKEND_PATH="$VOLUME_ROOT/$BACKEND_ROOT"

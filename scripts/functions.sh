@@ -79,31 +79,30 @@ GET_REPO_IN_URL() {
 	awk -F "://|@|:|/" '{print $3 "/" $4}' <<< "$url"
 }
 
-FIND_CONFIG_FILE() {
-	local TMP
+FIND_SETTINGS_PY() {
+	local TMP="$FRONTEND_SETTINGS_PY"
 
-	TMP="$CONFIG_FILE"
-	if [ -z "$TMP" ]; then
-		TMP="$(grep "os.environ.setdefault" "$FRONTEND_DIR/manage.py" | awk -F "'|)" '{print $4}' | tr "." "/")"
-		if [ -d "$FRONTEND_DIR/$TMP" ]; then
+	if [ -z "$TMP" ] || [ "$TMP" == "auto" ]; then
+		TMP="$(grep "os.environ.setdefault" "$FRONTEND_PATH/manage.py" | awk -F "'|)" '{print $4}' | tr "." "/")"
+		if [ -d "$FRONTEND_PATH/$TMP" ]; then
 			TMP="$TMP/local.py"
 		else
 			TMP="$TMP.py"
 		fi
 	fi
 
-	echo "$FRONTEND_DIR/$TMP"
+	echo "$FRONTEND_PATH/$TMP"
 }
 
 # Don't use settings that span multiple lines like INSTALLED_APPS, MIDDLEWARE
-DJANGO_CONFIG_SETTING() {
+DJANGO_SETTING_CHANGE() {
 	local key="$1"
 	local val="$2"
 	local file="$3"
 	local full="$key = $val"
 
 	if [ -z "$file" ]; then
-		file="$(FIND_CONFIG_FILE)"
+		file="$(FIND_SETTINGS_PY)"
 	fi
 	if [ ! -f "$file" ]; then
 		return 1

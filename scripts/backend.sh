@@ -30,7 +30,7 @@ fi
 
 
 
-if [ "$CUSTOM_UTILS" = false ]; then
+if [ "$BACKEND_CUSTOM_UTILS_PY" = false ]; then
 	if [ -z "$OPENAI_API_KEY" ]; then
 		IMPORTANT "To skip this step, set env OPENAI_API_KEY"
 		while [ -z "$OPENAI_API_KEY" ]; do
@@ -53,7 +53,7 @@ fi
 
 
 
-cd "$BACKEND_DIR" || exit 1
+cd "$BACKEND_PATH" || exit 1
 ACTION "Back-end has been Started"
 if [ "$BACKGROUND" != "&" ]; then
 	LOG_WITHOUT_NEWLINE INFO  "Press Ctrl+c to "
