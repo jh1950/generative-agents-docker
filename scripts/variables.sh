@@ -1,8 +1,5 @@
 #!/bin/bash
 
-read -a IPs <<< "$(hostname -I)"
-export IPs
-
 export PYTHON_VERSION="${PYTHON_VERSION:-"3.9.12"}"
 export VIRTUALENV_NAME="Python-$PYTHON_VERSION"
 export PYENV_VERSIONS_SAVE_PATH="$VOLUME_ROOT/$PYENV_VERSIONS_SAVE_ROOT"

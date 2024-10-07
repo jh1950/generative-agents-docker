@@ -143,7 +143,7 @@ else
 		INFO "File: ${SETTINGS_PATH#/}"
 
 		if [ -n "$FRONTEND_ALLOWED_HOSTS" ]; then
-			test "${FRONTEND_ALLOWED_HOSTS,,}" == "container" && FRONTEND_ALLOWED_HOSTS="$(echo "${IPs[*]}" | tr " " ",")"
+			test "${FRONTEND_ALLOWED_HOSTS,,}" == "container" && FRONTEND_ALLOWED_HOSTS="$(hostname -I | tr " " ",")"
 			ALLOWED_HOSTS="[$(echo "\"$FRONTEND_ALLOWED_HOSTS\"" | sed -E "s/,[[:blank:]]/,/g; s/[[:blank:]],/,/g; s/,,?+/,/g; s/,\"/\"/g; s/\",/\"/g; s/,/\", \"/g")]"
 			INFO "ALLOWED_HOSTS = $ALLOWED_HOSTS"
 			DJANGO_SETTING_CHANGE ALLOWED_HOSTS "$ALLOWED_HOSTS" "$SETTINGS_PATH"
