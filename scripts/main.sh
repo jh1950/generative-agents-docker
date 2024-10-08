@@ -2,7 +2,7 @@
 
 source "/scripts/functions.sh"
 
-cd "$VOLUME_ROOT" || exit 1
+cd "$DATA_DIR" || exit 1
 
 
 
@@ -56,7 +56,7 @@ touch "$PYENV_VERSIONS_SAVE_PATH/.installed"
 
 
 # Server Installation/Update
-if [ ! -d "$VOLUME_ROOT/.git" ]; then
+if [ ! -d "$DATA_DIR/.git" ]; then
 	ACTION "Starting Server Installation"
 else
 	ACTION "Starting Server Update"
@@ -73,7 +73,7 @@ else
 		exit 1
 	fi
 
-	if [ ! -d "$VOLUME_ROOT/.git" ]; then
+	if [ ! -d "$DATA_DIR/.git" ]; then
 		# Server Installation
 		git init
 		git remote add origin "$SERVER_INSTALL_URL"

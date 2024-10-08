@@ -4,7 +4,7 @@ LABEL maintainer="rlawnsgl191@gmail.com"
 
 ARG VERSION="unknown"
 ENV IMAGE_VERSION=$VERSION \
-    VOLUME_ROOT="/data" \
+    DATA_DIR="/data" \
     PYENV_ROOT="/pyenv" \
     PYENV_VERSIONS_SAVE_ROOT="pyenv-versions"
 ENV TZ="UTC" \
