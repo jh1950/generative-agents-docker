@@ -6,7 +6,7 @@
 > [아파치 라이선스](https://www.apache.org/licenses/LICENSE-2.0.txt)를 따릅니다.
 
 [![License](https://img.shields.io/github/license/jh1950/generative-agents-docker?label=License)](https://github.com/jh1950/generative-agents-docker/blob/main/LICENSE)
-[![Include License](https://img.shields.io/github/license/jh1950/generative_agents?&label=Include)](https://www.apache.org/licenses/LICENSE-2.0.txt)
+[![Include License](https://img.shields.io/github/license/joonspk-research/generative_agents?&label=Include)](https://www.apache.org/licenses/LICENSE-2.0.txt)
 
 [![GitHub](https://img.shields.io/badge/GitHub-Source-blue?logo=github)](https://github.com/jh1950/generative-agents-docker)
 [![Latest Version](https://img.shields.io/github/v/release/jh1950/generative-agents-docker?label=Latest)](https://github.com/jh1950/generative-agents-docker/releases)
@@ -120,15 +120,19 @@ docker exec -it generative_agents venv # v0.4.0 ~
 | PUID                                            | 서버를 실행할 유저의 UID (`id -u` 명령어로 확인 가능)                      | `1000`                                                  | 1~                                                                                               | 0.1.0       |
 | PGID                                            | 서버를 실행할 그룹의 GID (`id -g` 명령어로 확인 가능)                      | `1000`                                                  | 1~                                                                                               | 0.1.0       |
 | PYENV_AUTO_UPDATE                               | pyenv 버전 자동 업데이트                                                   | `true`                                                  | boolean                                                                                          | 1.0.0       |
-| PYTHON_VERSION                                  | 설치할 파이썬 버전                                                         | `3.9.12`                                                | [pyenv](https://github.com/pyenv/pyenv/tree/master/plugins/python-build/share/python-build) 참고 | 1.0.0       |
-| SERVER_INSTALL_URL\*                            | 설치할 서버의 URL                                                          | `https://github.com/joonspk-research/generative_agents` | 원본 프로젝트 및 포크된 버전의 URL                                                               | 1.0.0       |
+| SERVER_INSTALL_URL\*                            | 설치할 서버의 GitHub URL                                                   | `https://github.com/joonspk-research/generative_agents` | 원본 프로젝트 및 포크된 버전의 URL                                                               | 1.0.0       |
 | _**[SERVER_AUTO_UPDATE](#server_auto_update)**_ | 서버 실행 전 서버 업데이트 확인 및 진행                                    | `false`                                                 | boolean                                                                                          | 1.0.0       |
+| SERVER_PYTHON_VERSION\*                         | 설치할 파이썬 버전                                                         | `3.9.12`                                                | [pyenv](https://github.com/pyenv/pyenv/tree/master/plugins/python-build/share/python-build) 참고 | 1.1.0       |
 | SERVER_REQS_TXT\*                               | `/data` 디렉토리 내 `requirements.txt` 파일 경로                           | `requirements.txt`                                      | `path`, `./to`, `/file`                                                                          | 1.0.0       |
-| FRONTEND_ROOT                                   | `/data` 디렉토리 내 프론트엔드 디렉토리 경로                          | `environment/frontend_server`                           | `path`, `./to`, `/dir`                                                                           | 0.4.0       |
+| FRONTEND_ROOT                                   | `/data` 디렉토리 내 프론트엔드 디렉토리 경로                               | `environment/frontend_server`                           | `path`, `./to`, `/dir`                                                                           | 0.4.0       |
+| FRONTEND_PYTHON_VERSION                         | 프론트엔드 전용 파이썬 버전                                                | -                                                       | `PYTHON_VERSION` 참고                                                                            | 1.1.0       |
+| FRONTEND_REQS_TXT\*                             | `FRONTEND_ROOT` 디렉토리 내 `requirements.txt` 파일 경로                   | `requirements.txt`                                      | `path`, `./to`, `/file`                                                                          | 1.1.0       |
 | FRONTEND_SETTINGS_PY\*                          | `FRONTEND_ROOT` 디렉토리 내 프론트엔드 설정 파일 경로                      | any1/any2.py, any1/any2/local.py인 경우 자동 탐지       | `path`, `./to`, `/file`                                                                          | 1.0.0       |
 | FRONTEND_ALLOWED_HOSTS\*                        | 프론트엔드 접속 허용 IP를 설정 (쉼표로 구분하여 여러 값 설정 가능)         | `container`([컨테이너 내부 IP](#웹-접속))               | `IP`, `IP, Domain, ...`, `container`                                                             | 1.0.0       |
 | FRONTEND_TIME_ZONE\*                            | 프론트엔드 타임존 설정                                                     | `TZ` 값 사용                                            | `TZ` 참고                                                                                        | 1.0.0       |
 | BACKEND_ROOT                                    | `/data` 디렉토리 내 백엔드 디렉토리 경로                                   | `reverie/backend_server`                                | `path`, `./to`, `/dir`                                                                           | 0.5.0       |
+| BACKEND_PYTHON_VERSION                          | 백엔드 전용 파이썬 버전                                                    | -                                                       | `PYTHON_VERSION` 참고                                                                            | 1.1.0       |
+| BACKEND_REQS_TXT\*                              | `BACKEND_ROOT` 디렉토리 내 `requirements.txt` 파일 경로                    | `requirements.txt`                                      | `path`, `./to`, `/file`                                                                          | 1.1.0       |
 | BACKEND_CUSTOM_UTILS_PY                         | 커스텀 `utils.py` 파일 사용 (`BACKEND_ROOT` 디렉토리 내 직접 생성)         | `false`                                                 | boolean                                                                                          | 1.0.0       |
 | OPENAI_API_KEY                                  | OpenAI API Key (`BACKEND_CUSTOM_UTILS_PY` 값이 `false`일 경우 사용)        | -                                                       | `string`                                                                                         | 0.5.0       |
 | OPENAI_API_OWNER                                | OpenAI API Key 소유자 (`BACKEND_CUSTOM_UTILS_PY` 값이 `false`일 경우 사용) | -                                                       | `string`                                                                                         | 0.5.0       |
@@ -138,15 +142,16 @@ docker exec -it generative_agents venv # v0.4.0 ~
 <!-- markdownlint-disable-next-line -->
 <details><summary>제거된 변수 목록</summary>
 
-| 변수명        | 사용 가능한 버전 | 대체된 변수명           |
-|---------------|------------------|-------------------------|
-| REPO_URL      | 0.4.0 ~ 0.6.1    | SERVER_INSTALL_URL      |
-| AUTO_UPDATE   | 0.2.0 ~ 0.6.1    | SERVER_AUTO_UPDATE      |
-| REQUIREMENTS  | 0.6.0 ~ 0.6.1    | SERVER_REQS_TXT         |
-| CONFIG_FILE   | 0.2.0 ~ 0.6.1    | FRONTEND_SETTINGS_PY    |
-| ALLOWED_HOSTS | 0.1.0 ~ 0.6.1    | FRONTEND_ALLOWED_HOSTS  |
-| SYNC_TZ       | 0.3.1 ~ 0.6.1    | FRONTEND_TIME_ZONE      |
-| CUSTOM_UTILS  | 0.5.0 ~ 0.6.1    | BACKEND_CUSTOM_UTILS_PY |
+| 변수명         | 사용 가능한 버전 | 대체된 변수명           |
+|----------------|------------------|-------------------------|
+| ALLOWED_HOSTS  | 0.1.0 ~ 0.6.1    | FRONTEND_ALLOWED_HOSTS  |
+| AUTO_UPDATE    | 0.2.0 ~ 0.6.1    | SERVER_AUTO_UPDATE      |
+| CONFIG_FILE    | 0.2.0 ~ 0.6.1    | FRONTEND_SETTINGS_PY    |
+| SYNC_TZ        | 0.3.1 ~ 0.6.1    | FRONTEND_TIME_ZONE      |
+| REPO_URL       | 0.4.0 ~ 0.6.1    | SERVER_INSTALL_URL      |
+| CUSTOM_UTILS   | 0.5.0 ~ 0.6.1    | BACKEND_CUSTOM_UTILS_PY |
+| REQUIREMENTS   | 0.6.0 ~ 0.6.1    | SERVER_REQS_TXT         |
+| PYTHON_VERSION | 1.0.0 ~ 1.0.0    | SERVER_PYTHON_VERSION   |
 
 </details>
 

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source "/scripts/major_updates.sh"
+source "/scripts/notices.sh"
 source "/scripts/variables.sh"
 source "/scripts/functions.sh"
 
@@ -25,9 +25,9 @@ eval "$(pyenv init -)"
 ACTION "Change UID/PID"
 INFO "User UID: $PUID"
 INFO "User GID: $PGID"
-usermod -o -u "$PUID" user > /dev/null 2>&1
-groupmod -o -g "$PGID" user > /dev/null 2>&1
-chown -R "$PUID":"$PGID" "$DATA_DIR" "$PYENV_ROOT" /home/user /scripts
+usermod -o -u "$PUID" "$USER" > /dev/null 2>&1
+groupmod -o -g "$PGID" "$USER" > /dev/null 2>&1
+chown -R "$USER":"$USER" "$DATA_DIR" "$PYENV_ROOT" "/home/$USER" /scripts
 
 
 
@@ -39,7 +39,7 @@ trap "server_down" 15
 
 
 
-su user -c ./main.sh &
+su "$USER" -c ./main.sh &
 wait "$!"
 
 

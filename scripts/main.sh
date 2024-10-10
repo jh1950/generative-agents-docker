@@ -2,8 +2,6 @@
 
 source "/scripts/functions.sh"
 
-cd "$DATA_DIR" || exit 1
-
 
 
 # Docker Image Version Check
@@ -41,17 +39,48 @@ else
 fi
 
 # Python Installation
-ACTION "Starting Python Installation"
-INFO "PYTHON_VERSION = $PYTHON_VERSION"
-if ! pyenv install --list | grep -Eq ^"[[:blank:]]?+$PYTHON_VERSION"$; then
-	ERROR "Not found"
-	exit 1
-else
-	pyenv install "$PYTHON_VERSION"
-	pyenv virtualenv "$PYTHON_VERSION" "$VIRTUALENV_NAME"
+if [ -n "$SERVER_PYTHON_VERSION" ]; then
+	ACTION "Starting Python Installation"
+	INFO "SERVER_PYTHON_VERSION = $SERVER_PYTHON_VERSION"
+	INSTALL_PYTHON "$SERVER_PYTHON_VERSION" "$SERVER_VIRTUALENV_NAME" || { ERROR "Not found"; exit 1; }
+	pyenv global "$SERVER_VIRTUALENV_NAME"
 fi
-pyenv global "$VIRTUALENV_NAME"
-touch "$PYENV_VERSIONS_SAVE_PATH/.installed"
+if [ -n "$FRONTEND_PYTHON_VERSION" ]; then
+	ACTION "Starting Python Installation (Front-end)"
+	INFO "Path: ${FRONTEND_PATH#/}"
+	cd "$FRONTEND_PATH" || { ERROR "Not found" ; exit 1; }
+	INFO "FRONTEND_PYTHON_VERSION = $FRONTEND_PYTHON_VERSION"
+	INSTALL_PYTHON "$FRONTEND_PYTHON_VERSION" "$FRONTEND_VIRTUALENV_NAME" || { ERROR "Not found"; exit 1; }
+	pyenv local "$FRONTEND_VIRTUALENV_NAME"
+fi
+if [ -n "$BACKEND_PYTHON_VERSION" ]; then
+	ACTION "Starting Python Installation (Back-end)"
+	INFO "Path: ${BACKEND_PATH#/}"
+	cd "$BACKEND_PATH" || { ERROR "Not found" ; exit 1; }
+	INFO "BACKEND_PYTHON_VERSION = $BACKEND_PYTHON_VERSION"
+	INSTALL_PYTHON "$BACKEND_PYTHON_VERSION" "$BACKEND_VIRTUALENV_NAME" || { ERROR "Not found"; exit 1; }
+	pyenv local "$BACKEND_VIRTUALENV_NAME"
+fi
+
+# Python Modules Update
+if [ -n "$SERVER_PYTHON_VERSION" ] && [ -n "$SERVER_REQS_TXT" ]; then
+	ACTION "Starting Python Modules Update"
+	INFO "Flie: ${SERVER_REQS_PATH#/}"
+	FILE_EXISTS "$SERVER_REQS_PATH" || WARNING "Not found"
+	INSTALL_PYTHON_MODULES "/" "$SERVER_REQS_PATH" "$SERVER_VIRTUALENV_NAME" || { ERROR "Update Error"; exit 1; }
+fi
+if [ -n "$FRONTEND_PYTHON_VERSION" ] && [ -n "$FRONTEND_REQS_TXT" ]; then
+	ACTION "Starting Python Modules Update (Front-end)"
+	INFO "Flie: ${FRONTEND_REQS_PATH#/}"
+	FILE_EXISTS "$FRONTEND_REQS_PATH" || WARNING "Not found"
+	INSTALL_PYTHON_MODULES "$FRONTEND_PATH" "$FRONTEND_REQS_PATH" "$FRONTEND_VIRTUALENV_NAME" || { ERROR "Update Error"; exit 1; }
+fi
+if [ -n "$BACKEND_PYTHON_VERSION" ] && [ -n "$BACKEND_REQS_TXT" ]; then
+	ACTION "Starting Python Modules Update (Back-end)"
+	INFO "Flie: ${BACKEND_REQS_PATH#/}"
+	FILE_EXISTS "$BACKEND_REQS_PATH" || WARNING "Not found"
+	INSTALL_PYTHON_MODULES "$BACKEND_PATH" "$BACKEND_REQS_PATH" "$BACKEND_VIRTUALENV_NAME" || { ERROR "Update Error"; exit 1; }
+fi
 
 
 
@@ -61,6 +90,8 @@ if [ ! -d "$DATA_DIR/.git" ]; then
 else
 	ACTION "Starting Server Update"
 fi
+
+cd "$DATA_DIR" || exit 1
 if [ -z "$SERVER_INSTALL_URL" ]; then
 	# Local Server
 	IMPORTANT "SERVER_INSTALL_URL is not set"
@@ -103,32 +134,6 @@ fi
 
 
 
-# Python Modules Update
-ACTION "Starting Python Modules Update"
-if [ -z "$SERVER_REQS_TXT" ]; then
-	INFO "SERVER_REQS_TXT = \"\""
-else
-	INFO "File: ${SERVER_REQS_PATH#/}"
-	if [ ! -f "$SERVER_REQS_PATH" ]; then
-		WARNING "Not found"
-	else
-		tmp_file="$(mktemp)"
-		sha256sum <<< "$(cat "$SERVER_REQS_PATH")$VIRTUALENV_NAME" | awk '{print $1}' > "$tmp_file"
-		if diff "$PYENV_VERSIONS_SAVE_PATH/.installed" "$tmp_file" > /dev/null 2>&1; then
-			SUCCESS "Already Up To Date"
-		else
-			$PIP install -U pip
-			if ! $PIP install -Ur "$SERVER_REQS_PATH"; then
-				ERROR "Update Error"
-				exit 1
-			fi
-			mv "$tmp_file" "$PYENV_VERSIONS_SAVE_PATH/.installed"
-		fi
-	fi
-fi
-
-
-
 # Front-end Setting
 cd "$FRONTEND_PATH" || exit 1
 SETTINGS_PATH="$(FIND_SETTINGS_PY)"
@@ -137,7 +142,7 @@ ACTION "Front-end Setting"
 if [ "$FRONTEND_SETTINGS_PY" = false ]; then
 	INFO "FRONTEND_SETTINGS_PY = \"\""
 else
-	if [ ! -f "$SETTINGS_PATH" ]; then
+	if ! FILE_EXISTS "$SETTINGS_PATH"; then
 		ERROR "Not Found: ${SETTINGS_PATH#/}"
 	else
 		INFO "File: ${SETTINGS_PATH#/}"
@@ -174,7 +179,7 @@ fi
 
 
 # Front-end Start
-mkdir -p "$FRONTEND_PATH/"{storage,compressed_storage,temp_storage}
+mkdir -p {storage,compressed_storage,temp_storage}
 ACTION "Front-end has been Started"
 $PYTHON manage.py migrate
 $PYTHON manage.py runserver 0.0.0.0:8000
