@@ -10,7 +10,7 @@ services:
       TZ: "Asia/Seoul"
       PUID: 1000
       PGID: 1000
-      PYTHON_VERSION: "3.9.12"
+      SERVER_PYTHON_VERSION: "3.9.12"
       FRONTEND_ALLOWED_HOSTS: "*"
       BACKEND_CUSTOM_UTILS_PY: false  # Manually create data/BACKEND_ROOT/utils.py if true
       OPENAI_API_KEY: "OpenAI-API-KEY"  # Use if CUSTOM_UTILS is false
