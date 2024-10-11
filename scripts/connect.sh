@@ -11,7 +11,7 @@ case "$mode" in
 		USER_RUN /bin/bash
 		;;
 	venv|django-shell)
-		cd "$FRONTEND_PATH"
+		cd "$FRONTEND_PATH" || exit 1
 		USER_RUN "$PYTHON" manage.py shell
 		;;
 	*)
