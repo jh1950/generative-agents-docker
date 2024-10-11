@@ -26,7 +26,6 @@ if [ "$ALLOWED_HOSTS" != "unused" ] && [ -z "$FRONTEND_ALLOWED_HOSTS" ]; then
 	export FRONTEND_ALLOWED_HOSTS
 fi
 if [ -n "$SYNC_TZ" ] && [ "$FRONTEND_TIME_ZONE" == "TZ" ]; then
-	# 추가 작업 필요
 	WARNING "SYNC_TZ will no longer be used, Use FRONTEND_TIME_ZONE instead"
 	FRONTEND_TIME_ZONE=""
 	if [ "$SYNC_TZ" = true ]; then

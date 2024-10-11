@@ -22,6 +22,56 @@ fi
 
 
 
+# Server Installation/Update
+if [ ! -d "$DATA_DIR/.git" ]; then
+	ACTION "Starting Server Installation"
+else
+	ACTION "Starting Server Update"
+fi
+
+cd "$DATA_DIR" || exit 1
+if [ -z "$SERVER_INSTALL_URL" ]; then
+	# Local Server
+	IMPORTANT "SERVER_INSTALL_URL is not set"
+else
+	# Repository URL Check
+	INFO "URL: $SERVER_INSTALL_URL"
+	status="$(curl -sfSL -o /dev/null -w "%{http_code}" "$SERVER_INSTALL_URL")"
+	if [ "$status" -ne 200 ]; then
+		ERROR "Invalid URL"
+		exit 1
+	fi
+
+	if [ ! -d "$DATA_DIR/.git" ]; then
+		# Server Installation
+		git init
+		git remote add origin "$SERVER_INSTALL_URL"
+		git fetch origin main
+		git checkout main
+	elif [ "$SERVER_AUTO_UPDATE" = true ]; then
+		# Server Update
+		INSTALLED_URL="$(git config remote.origin.url)"
+		if [ "$(GET_REPO_IN_URL "$INSTALLED_URL")" != "$(GET_REPO_IN_URL "$SERVER_INSTALL_URL")" ]; then
+			INFO "Installed URL: $INSTALLED_URL"
+			WARNING "Update Cannot Checked: Server URL Mismatch"
+		else
+			CURRENT_COMMIT=$(git log HEAD -1 --format=format:%H)
+			INFO "Current Version: $CURRENT_COMMIT"
+			LATEST_COMMIT=$(curl -sfSL "$GITHUB_API/commits/main" 2> /dev/null | jq .sha -r)
+			if [ -z "$LATEST_COMMIT" ]; then
+				WARNING "Failed to check latest version"
+			elif [ "$CURRENT_COMMIT" != "$LATEST_COMMIT" ]; then
+				INFO "Latest Version: $LATEST_COMMIT"
+				git stash save "$(date "+%F %T")"
+				git fetch origin main
+				git pull origin main
+			fi
+		fi
+	fi
+fi
+
+
+
 # pyenv Update
 ACTION "Checking pyenv Version..."
 PYENV_CUR_VERSION="$(pyenv --version)"
@@ -80,56 +130,6 @@ if [ -n "$BACKEND_PYTHON_VERSION" ] && [ -n "$BACKEND_REQS_TXT" ]; then
 	INFO "Flie: ${BACKEND_REQS_PATH#/}"
 	FILE_EXISTS "$BACKEND_REQS_PATH" || WARNING "Not found"
 	INSTALL_PYTHON_MODULES "$BACKEND_PATH" "$BACKEND_REQS_PATH" "$BACKEND_VIRTUALENV_NAME" || { ERROR "Update Error"; exit 1; }
-fi
-
-
-
-# Server Installation/Update
-if [ ! -d "$DATA_DIR/.git" ]; then
-	ACTION "Starting Server Installation"
-else
-	ACTION "Starting Server Update"
-fi
-
-cd "$DATA_DIR" || exit 1
-if [ -z "$SERVER_INSTALL_URL" ]; then
-	# Local Server
-	IMPORTANT "SERVER_INSTALL_URL is not set"
-else
-	# Repository URL Check
-	INFO "URL: $SERVER_INSTALL_URL"
-	status="$(curl -sfSL -o /dev/null -w "%{http_code}" "$SERVER_INSTALL_URL")"
-	if [ "$status" -ne 200 ]; then
-		ERROR "Invalid URL"
-		exit 1
-	fi
-
-	if [ ! -d "$DATA_DIR/.git" ]; then
-		# Server Installation
-		git init
-		git remote add origin "$SERVER_INSTALL_URL"
-		git fetch origin main
-		git checkout main
-	elif [ "$SERVER_AUTO_UPDATE" = true ]; then
-		# Server Update
-		INSTALLED_URL="$(git config remote.origin.url)"
-		if [ "$(GET_REPO_IN_URL "$INSTALLED_URL")" != "$(GET_REPO_IN_URL "$SERVER_INSTALL_URL")" ]; then
-			INFO "Installed URL: $INSTALLED_URL"
-			WARNING "Update Cannot Checked: Server URL Mismatch"
-		else
-			CURRENT_COMMIT=$(git log HEAD -1 --format=format:%H)
-			INFO "Current Version: $CURRENT_COMMIT"
-			LATEST_COMMIT=$(curl -sfSL "$GITHUB_API/commits/main" 2> /dev/null | jq .sha -r)
-			if [ -z "$LATEST_COMMIT" ]; then
-				WARNING "Failed to check latest version"
-			elif [ "$CURRENT_COMMIT" != "$LATEST_COMMIT" ]; then
-				INFO "Latest Version: $LATEST_COMMIT"
-				git stash save "$(date "+%F %T")"
-				git fetch origin main
-				git pull origin main
-			fi
-		fi
-	fi
 fi
 
 

@@ -100,7 +100,7 @@ docker exec -it --user user generative_agents bash # v0.1.0 ~
 Interactive 모드로, 프론트엔드인 Django 서버와 연결됩니다.
 
 ```bash
-docker exec -it generative_agents venv # v0.4.0 ~
+docker exec -it generative_agents <venv|django-shell> # v0.4.0 ~
 ```
 
 
