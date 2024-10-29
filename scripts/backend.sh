@@ -30,7 +30,15 @@ fi
 
 
 
-if [ "$BACKEND_CUSTOM_UTILS_PY" = false ]; then
+if [ "$BACKEND_CUSTOM_UTILS_PY" = true ]; then
+	if [ ! -f "$BACKEND_PATH/utils.py" ]; then
+		INFO "Copy utils.py to ${BACKEND_PATH#/}/utils.py"
+		INFO "Waiting..."
+		while [ ! -f "$BACKEND_PATH/utils.py" ]; do
+			sleep 1s
+		fi
+	fi
+else
 	if [ -z "$OPENAI_API_KEY" ]; then
 		IMPORTANT "To skip this step, set env OPENAI_API_KEY"
 		while [ -z "$OPENAI_API_KEY" ]; do

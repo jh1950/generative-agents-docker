@@ -7,6 +7,10 @@ if [ "$REPO_URL" != "unused" ] && [ "$SERVER_INSTALL_URL" == "https://github.com
 	WARNING "REPO_URL will no longer be used, Use SERVER_INSTALL_URL instead"
 	export SERVER_INSTALL_URL="$REPO_URL"
 fi
+if [ -n "$AUTO_UPDATE" ] && [ "$SERVER_AUTO_UPDATE" = false ]; then
+	WARNING "AUTO_UPDATE will no longer be used, Use SERVER_AUTO_UPDATE instead"
+	export SERVER_AUTO_UPDATE="$AUTO_UPDATE"
+fi
 if [ -n "$REQUIREMENTS" ] && [ "$SERVER_REQS_TXT" == "requirements.txt" ]; then
 	WARNING "REQUIREMENTS will no longer be used, Use SERVER_REQS_TXT instead"
 	export SERVER_REQS_TXT="$REQUIREMENTS"
