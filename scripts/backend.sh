@@ -36,7 +36,7 @@ if [ "$BACKEND_CUSTOM_UTILS_PY" = true ]; then
 		INFO "Waiting..."
 		while [ ! -f "$BACKEND_PATH/utils.py" ]; do
 			sleep 1s
-		fi
+		done
 	fi
 else
 	if [ -z "$OPENAI_API_KEY" ]; then
