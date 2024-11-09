@@ -92,13 +92,25 @@ JOIN() {
 # Returns 1 if not found version
 INSTALL_PYTHON() {
 	local PYTHON_VERSION="$1"
-	local VIRTUALENV_NAME="$2"
 
 	if ! pyenv install --list | grep -Eq ^"[[:blank:]]?+$PYTHON_VERSION"$; then
 		return 1
 	fi
 
 	pyenv install "$PYTHON_VERSION"
+	touch "$PYENV_VERSIONS/$PYTHON_VERSION/.installed"
+}
+
+# Returns 0 if successful or already installed
+# Returns 1 if not found version
+CREATE_VENV() {
+	local PYTHON_VERSION="$1"
+	local VIRTUALENV_NAME="$2"
+
+	if ! pyenv install --list | grep -Eq ^"[[:blank:]]?+$PYTHON_VERSION"$; then
+		return 1
+	fi
+
 	pyenv virtualenv "$PYTHON_VERSION" "$VIRTUALENV_NAME"
 	touch "$PYENV_VERSIONS/$VIRTUALENV_NAME/.installed"
 }

@@ -6,12 +6,13 @@ ARG VERSION="unknown"
 ENV IMAGE_VERSION=$VERSION \
     DATA_DIR="/data" \
     PYENV_ROOT="/data/pyenv" \
+    PYENV_ROOT="/pyenv" \
+    PYENV_VERSIONS_SAVE_ROOT="pyenv-versions" \
     USER="user"
 ENV TZ="UTC" \
     PUID=1000 \
     PGID=1000 \
     DOCKER_VERSION_CHECK=true \
-    PYENV_AWAIT_INSTALL=false \
     PYENV_AUTO_UPDATE=true \
     SERVER_INSTALL_URL="https://github.com/joonspk-research/generative_agents" \
     SERVER_AUTO_UPDATE=false \
@@ -19,6 +20,7 @@ ENV TZ="UTC" \
     SERVER_PYTHON_VERSION="3.9.12" \
     SERVER_REQS_TXT="requirements.txt" \
     FRONTEND_ROOT="environment/frontend_server" \
+    FRONTEND_ENABLED=true \
     FRONTEND_PYTHON_AWAIT_INSTALL=false \
     FRONTEND_PYTHON_VERSION="" \
     FRONTEND_REQS_TXT="requirements.txt" \
@@ -50,6 +52,9 @@ RUN apt-get update -y \
     libreadline-dev libssl-dev \
     libsqlite3-dev liblzma-dev \
  && useradd -ms /bin/bash "$USER" \
+ && curl -sfSL https://pyenv.run | bash \
+ && pyenv update \
+ && echo -e "eval \"\$(pyenv init -)\"\neval \"\$(pyenv virtualenv-init -)\"" >> "/home/$USER/.bashrc" \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/*
 

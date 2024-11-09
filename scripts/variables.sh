@@ -2,6 +2,7 @@
 
 export PYTHON="$PYENV_ROOT/shims/python3"
 export PIP="$PYENV_ROOT/shims/pip3"
+export PYENV_VERSIONS_SAVE_PATH="$DATA_DIR/$PYENV_VERSIONS_SAVE_ROOT"
 export PYENV_VERSIONS="$PYENV_ROOT/versions"
 export GITHUB_API="${SERVER_INSTALL_URL/github\.com/api.github.com\/repos}"
 

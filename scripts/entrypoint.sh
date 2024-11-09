@@ -17,18 +17,22 @@ fi
 
 
 
+# pyenv init
+mkdir -p "$PYENV_VERSIONS_SAVE_PATH"
+test -e "$PYENV_VERSIONS" || ln -s "$PYENV_VERSIONS_SAVE_PATH" "$PYENV_VERSIONS"
+eval "$(pyenv init -)"
+
 ACTION "Change UID/PID"
 INFO "User UID: $PUID"
 INFO "User GID: $PGID"
-mkdir -p "$DATA_DIR"
 usermod -o -u "$PUID" "$USER" > /dev/null 2>&1
 groupmod -o -g "$PGID" "$USER" > /dev/null 2>&1
-chown -R "$USER":"$USER" "$DATA_DIR" "/home/$USER" /scripts
+chown -R "$USER":"$USER" "$DATA_DIR" "$PYENV_ROOT" "/home/$USER" /scripts
 
 
 
 server_down() {
-	pid="$(pgrep -f manage.py | tail -1)"
+	pid="$(pgrep -f "manage.py|sleep infinity" | tail -1)"
 	kill -15 "$pid"
 }
 trap "server_down" 15

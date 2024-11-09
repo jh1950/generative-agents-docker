@@ -72,42 +72,23 @@ fi
 
 
 
-if [ "$PYENV_AWAIT_INSTALL" = true ]; then
-	IMPORTANT "PYENV_AWAIT_INSTALL = true"
-	if ! DIR_EXISTS "$PYENV_VERSIONS"; then
-		INFO "Waiting for pyenv to be installed..."
-		while ! DIR_EXISTS "$PYENV_VERSIONS"; do
-			sleep 3s
-		done
-	fi
+# pyenv Update
+if [ "$PYENV_AUTO_UPDATE" != true ]; then
+	IMPORTANT "PYENV_AUTO_UPDATE = $PYENV_AUTO_UPDATE"
 else
-	if ! which pyenv > /dev/null; then
-		# pyenv Installation
-		ACTION "Starting pyenv Installation"
-		curl -sfSL https://pyenv.run | bash
-		pyenv update
-		eval "$(pyenv init -)"
-		SUCCESS "pyenv Version: $(pyenv --version)"
-	elif [ "$PYENV_AUTO_UPDATE" == true ]; then
-		# pyenv Update
-		ACTION "Checking pyenv Version..."
-		PYENV_CUR_VERSION="$(pyenv --version)"
-		INFO "pyenv Version: ${PYENV_CUR_VERSION#* }"
-		if [ "$PYENV_AUTO_UPDATE" != true ]; then
-			INFO "PYENV_AUTO_UPDATE = $PYENV_AUTO_UPDATE"
-		else
-			pyenv update > /dev/null 2>&1
-			PYENV_NEW_VERSION="$(pyenv --version)"
-			if [ "$PYENV_CUR_VERSION" == "$PYENV_NEW_VERSION" ]; then
-				SUCCESS "Already Up To Date"
-			else
-				SUCCESS "Update Complete: ${PYENV_NEW_VERSION#* }"
-			fi
-		fi
+	ACTION "Checking pyenv Version..."
+	PYENV_CUR_VERSION="$(pyenv --version)"
+	INFO "pyenv Version: ${PYENV_CUR_VERSION#* }"
+	pyenv update > /dev/null 2>&1
+	PYENV_NEW_VERSION="$(pyenv --version)"
+	if [ "$PYENV_CUR_VERSION" == "$PYENV_NEW_VERSION" ]; then
+		SUCCESS "Already Up To Date"
+	else
+		SUCCESS "Update Complete: ${PYENV_NEW_VERSION#* }"
 	fi
 fi
-echo -e "eval \"\$(pyenv init -)\"\neval \"\$(pyenv virtualenv-init -)\"" >> "/home/$USER/.bashrc"
 
+AWAIT=()
 F_TMP() {
 	local PREFIX="$1"
 	local DIR="$2"
@@ -115,75 +96,58 @@ F_TMP() {
 	local REQS_PATH="$4"
 	local VIRTUALENV_NAME="$5"
 	local PYTHON_AWAIT_INSTALL="$6"
-	local LOCKFILE="$PYENV_VERSIONS/$VIRTUALENV_NAME.lock"
+	local LOCKFILE_PY="$PYENV_VERSIONS/$PYTHON_VERSION.lock"
+	local LOCKFILE_ENV="$PYENV_VERSIONS/$VIRTUALENV_NAME.lock"
 	# Delete LOCKFILE when modules installed ready
 
-	if [ -n "$PYTHON_VERSION" ] && [ "$PYTHON_AWAIT_INSTALL" = true ]; then
-		IMPORTANT "PYENV_AWAIT_INSTALL or ${PREFIX}PYTHON_AWAIT_INSTALL = true"
-		if ! DIR_EXISTS "$PYENV_VERSIONS/$VIRTUALENV_NAME" || FILE_EXISTS "$LOCKFILE"; then
-			touch "$LOCKFILE"
-			INFO "Waiting for $VIRTUALENV_NAME to be installed..."
-			while FILE_EXISTS "$LOCKFILE"; do
+	if [ -z "$PYTHON_VERSION" ]; then
+		:
+	elif [ "$PYTHON_AWAIT_INSTALL" = true ] || FILE_EXISTS "$LOCKFILE_ENV"; then
+		AWAIT+=("$VIRTUALENV_NAME")
+	else
+		touch "$LOCKFILE_ENV"
+		if FILE_EXISTS "$LOCKFILE_PY"; then
+			INFO "Waiting for $PYTHON_VERSION to be installed..."
+			while FILE_EXISTS "$LOCKFILE_PY"; do
 				sleep 3s
 			done
-		fi
-	else
-		touch "$LOCKFILE"
-		# Python Installation
-		if [ -n "$PYTHON_VERSION" ]; then
+		else
+			touch "$LOCKFILE_PY"
+
+			# Python Installation
 			ACTION "Starting Python Installation"
 			INFO "Path: ${DIR#/}"
 			cd "$DIR" || { ERROR "Not found" ; exit 1; }
 			INFO "${PREFIX}PYTHON_VERSION = $PYTHON_VERSION"
 			INSTALL_PYTHON "$PYTHON_VERSION" "$VIRTUALENV_NAME" || { ERROR "Not found"; exit 1; }
+			rm -f "$LOCKFILE_PY"
 		fi
 
+		CREATE_VENV "$PYTHON_VERSION" "$VIRTUALENV_NAME"
 		# Python Modules Update
-		if [ -n "$PYTHON_VERSION" ] && [ -n "$REQS_PATH" ]; then
+		if [ -n "$REQS_PATH" ]; then
 			ACTION "Starting Python Modules Update"
 			INFO "Flie: ${REQS_PATH#/}"
 			FILE_EXISTS "$REQS_PATH" || WARNING "Not found"
 			INSTALL_PYTHON_MODULES "$DIR" "$REQS_PATH" "$VIRTUALENV_NAME" || { ERROR "Update Error"; exit 1; }
 		fi
-		rm -f "$LOCKFILE"
+		rm -f "$LOCKFILE_ENV"
 	fi
 }
 F_TMP "SERVER_" "$DATA_DIR" "$SERVER_PYTHON_VERSION" "$SERVER_REQS_PATH" "$SERVER_VIRTUALENV_NAME" "$SERVER_PYTHON_AWAIT_INSTALL"
 F_TMP "FRONTEND_" "$FRONTEND_PATH" "$FRONTEND_PYTHON_VERSION" "$FRONTEND_REQS_PATH" "$FRONTEND_VIRTUALENV_NAME" "$FRONTEND_PYTHON_AWAIT_INSTALL"
 F_TMP "BACKEND_" "$BACKEND_PATH" "$BACKEND_PYTHON_VERSION" "$BACKEND_REQS_PATH" "$BACKEND_VIRTUALENV_NAME" "$BACKEND_PYTHON_AWAIT_INSTALL"
-pyenv global "$GLOBAL_VIRTUALENV_NAME"
-
-
-
-# Front-end Setting
-if [ "$FRONTEND_SETTINGS_PY" = false ]; then
-	INFO "FRONTEND_SETTINGS_PY = \"\""
-else
-	cd "$FRONTEND_PATH" || exit 1
-	ACTION "Front-end Setting"
-	SETTINGS_PATH="$(FIND_SETTINGS_PY)"
-	if ! FILE_EXISTS "$SETTINGS_PATH"; then
-		ERROR "Not Found: ${SETTINGS_PATH#/}"
-	else
-		INFO "File: ${SETTINGS_PATH#/}"
-
-		if [ -n "$FRONTEND_ALLOWED_HOSTS" ]; then
-			test "${FRONTEND_ALLOWED_HOSTS,,}" == "container" && FRONTEND_ALLOWED_HOSTS="$(hostname -I | tr " " ",")"
-			ALLOWED_HOSTS="[$(echo "\"$FRONTEND_ALLOWED_HOSTS\"" | sed -E "s/,[[:blank:]]/,/g; s/[[:blank:]],/,/g; s/,,?+/,/g; s/,\"/\"/g; s/\",/\"/g; s/,/\", \"/g")]"
-			INFO "ALLOWED_HOSTS = $ALLOWED_HOSTS"
-			DJANGO_SETTING_CHANGE ALLOWED_HOSTS "$ALLOWED_HOSTS" "$SETTINGS_PATH"
-		fi
-
-		if [ -n "$FRONTEND_TIME_ZONE" ]; then
-			TMP="$FRONTEND_TIME_ZONE"
-			if [ "${FRONTEND_TIME_ZONE,,}" == "tz" ]; then
-				TMP="$TZ"
-			fi
-			INFO "TIME_ZONE = \"$TMP\""
-			DJANGO_SETTING_CHANGE TIME_ZONE "\"$TMP\"" "$SETTINGS_PATH"
-		fi
+for VIRTUALENV_NAME in "${AWAIT[@]}"; do
+	LOCKFILE="$PYENV_VERSIONS/$VIRTUALENV_NAME.lock"
+	if ! DIR_EXISTS "$PYENV_VERSIONS/$VIRTUALENV_NAME" || FILE_EXISTS "$LOCKFILE"; then
+		touch "$LOCKFILE"
+		INFO "Waiting for $VIRTUALENV_NAME to be installed..."
+		while FILE_EXISTS "$LOCKFILE"; do
+			sleep 3s
+		done
 	fi
-fi
+done
+pyenv global "$GLOBAL_VIRTUALENV_NAME"
 
 
 
@@ -198,8 +162,43 @@ fi
 
 
 
-# Front-end Start
-mkdir -p {storage,compressed_storage,temp_storage}
-ACTION "Front-end has been Started"
-$FRONTEND_PYTHON manage.py migrate
-$FRONTEND_PYTHON manage.py runserver 0.0.0.0:8000
+# Front-end Setting
+if [ "$FRONTEND_ENABLED" = false ]; then
+	IMPORTANT "FRONTEND_ENABLED = false"
+	sleep infinity
+else
+	if [ "$FRONTEND_SETTINGS_PY" = false ]; then
+		INFO "FRONTEND_SETTINGS_PY = \"\""
+	else
+		cd "$FRONTEND_PATH" || exit 1
+		ACTION "Front-end Setting"
+		SETTINGS_PATH="$(FIND_SETTINGS_PY)"
+		if ! FILE_EXISTS "$SETTINGS_PATH"; then
+			ERROR "Not Found: ${SETTINGS_PATH#/}"
+		else
+			INFO "File: ${SETTINGS_PATH#/}"
+
+			if [ -n "$FRONTEND_ALLOWED_HOSTS" ]; then
+				test "${FRONTEND_ALLOWED_HOSTS,,}" == "container" && FRONTEND_ALLOWED_HOSTS="$(hostname -I | tr " " ",")"
+				ALLOWED_HOSTS="[$(echo "\"$FRONTEND_ALLOWED_HOSTS\"" | sed -E "s/,[[:blank:]]/,/g; s/[[:blank:]],/,/g; s/,,?+/,/g; s/,\"/\"/g; s/\",/\"/g; s/,/\", \"/g")]"
+				INFO "ALLOWED_HOSTS = $ALLOWED_HOSTS"
+				DJANGO_SETTING_CHANGE ALLOWED_HOSTS "$ALLOWED_HOSTS" "$SETTINGS_PATH"
+			fi
+
+			if [ -n "$FRONTEND_TIME_ZONE" ]; then
+				TMP="$FRONTEND_TIME_ZONE"
+				if [ "${FRONTEND_TIME_ZONE,,}" == "tz" ]; then
+					TMP="$TZ"
+				fi
+				INFO "TIME_ZONE = \"$TMP\""
+				DJANGO_SETTING_CHANGE TIME_ZONE "\"$TMP\"" "$SETTINGS_PATH"
+			fi
+		fi
+	fi
+
+	# Front-end Start
+	mkdir -p {storage,compressed_storage,temp_storage}
+	ACTION "Front-end has been Started"
+	$FRONTEND_PYTHON manage.py migrate
+	$FRONTEND_PYTHON manage.py runserver 0.0.0.0:8000
+fi
