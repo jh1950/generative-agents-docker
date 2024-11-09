@@ -118,7 +118,7 @@ F_TMP() {
 	local LOCKFILE="$PYENV_VERSIONS/$VIRTUALENV_NAME.lock"
 	# Delete LOCKFILE when modules installed ready
 
-	if [ -n "$PYTHON_VERSION" ] && { [ "$PYENV_AWAIT_INSTALL" = true ] || [ "$PYTHON_AWAIT_INSTALL" = true ]; } then
+	if [ -n "$PYTHON_VERSION" ] && [ "$PYTHON_AWAIT_INSTALL" = true ]; then
 		IMPORTANT "PYENV_AWAIT_INSTALL or ${PREFIX}PYTHON_AWAIT_INSTALL = true"
 		if ! DIR_EXISTS "$PYENV_VERSIONS/$VIRTUALENV_NAME" || FILE_EXISTS "$LOCKFILE"; then
 			touch "$LOCKFILE"
