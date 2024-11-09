@@ -97,10 +97,10 @@ INSTALL_PYTHON() {
 	if ! pyenv install --list | grep -Eq ^"[[:blank:]]?+$PYTHON_VERSION"$; then
 		return 1
 	fi
-	
+
 	pyenv install "$PYTHON_VERSION"
 	pyenv virtualenv "$PYTHON_VERSION" "$VIRTUALENV_NAME"
-	touch "$PYENV_VERSIONS_SAVE_PATH/$VIRTUALENV_NAME/.installed"
+	touch "$PYENV_VERSIONS/$VIRTUALENV_NAME/.installed"
 }
 
 # Returns 0 if update required
@@ -117,7 +117,7 @@ MODULE_UPDATE_REQUIRED() {
 	echo "$tmp_file"
 
 	sha256sum <<< "$(cat "$REQS_PATH")$VIRTUALENV_NAME" | awk '{print $1}' > "$tmp_file"
-	if diff "$PYENV_VERSIONS_SAVE_PATH/$VIRTUALENV_NAME/.installed" "$tmp_file" > /dev/null 2>&1; then
+	if diff "$PYENV_VERSIONS/$VIRTUALENV_NAME/.installed" "$tmp_file" > /dev/null 2>&1; then
 		return 1
 	else
 		return 0
@@ -137,9 +137,9 @@ INSTALL_PYTHON_MODULES() {
 	cd "$DIR" || return
 
 	if tmp_file="$(MODULE_UPDATE_REQUIRED "$REQS_PATH" "$VIRTUALENV_NAME")"; then
-		$PIP install -U pip
-		$PIP install -Ur "$REQS_PATH" || return 1
-		mv "$tmp_file" "$PYENV_VERSIONS_SAVE_PATH/$VIRTUALENV_NAME/.installed"
+		$PYENV_VERSIONS/$VIRTUALENV_NAME/bin/pip3 install -U pip
+		$PYENV_VERSIONS/$VIRTUALENV_NAME/bin/pip3 install -Ur "$REQS_PATH" || return 1
+		mv "$tmp_file" "$PYENV_VERSIONS/$VIRTUALENV_NAME/.installed"
 	fi
 }
 

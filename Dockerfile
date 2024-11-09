@@ -5,24 +5,28 @@ LABEL maintainer="rlawnsgl191@gmail.com"
 ARG VERSION="unknown"
 ENV IMAGE_VERSION=$VERSION \
     DATA_DIR="/data" \
-    PYENV_ROOT="/pyenv" \
-    PYENV_VERSIONS_SAVE_ROOT="pyenv-versions" \
+    PYENV_ROOT="/data/pyenv" \
     USER="user"
 ENV TZ="UTC" \
     PUID=1000 \
     PGID=1000 \
+    DOCKER_VERSION_CHECK=true \
+    PYENV_AWAIT_INSTALL=false \
     PYENV_AUTO_UPDATE=true \
     SERVER_INSTALL_URL="https://github.com/joonspk-research/generative_agents" \
     SERVER_AUTO_UPDATE=false \
+    SERVER_PYTHON_AWAIT_INSTALL=false \
     SERVER_PYTHON_VERSION="3.9.12" \
     SERVER_REQS_TXT="requirements.txt" \
     FRONTEND_ROOT="environment/frontend_server" \
+    FRONTEND_PYTHON_AWAIT_INSTALL=false \
     FRONTEND_PYTHON_VERSION="" \
     FRONTEND_REQS_TXT="requirements.txt" \
     FRONTEND_SETTINGS_PY="auto" \
     FRONTEND_ALLOWED_HOSTS="" \
     FRONTEND_TIME_ZONE="TZ" \
     BACKEND_ROOT="reverie/backend_server" \
+    BACKEND_PYTHON_AWAIT_INSTALL=false \
     BACKEND_PYTHON_VERSION="" \
     BACKEND_REQS_TXT="requirements.txt" \
     BACKEND_CUSTOM_UTILS_PY=false
@@ -46,9 +50,6 @@ RUN apt-get update -y \
     libreadline-dev libssl-dev \
     libsqlite3-dev liblzma-dev \
  && useradd -ms /bin/bash "$USER" \
- && curl -sfSL https://pyenv.run | bash \
- && pyenv update \
- && echo -e "eval \"\$(pyenv init -)\"\neval \"\$(pyenv virtualenv-init -)\"" >> "/home/$USER/.bashrc" \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/*
 

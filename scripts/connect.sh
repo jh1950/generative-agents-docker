@@ -12,7 +12,7 @@ case "$mode" in
 		;;
 	venv|django-shell)
 		cd "$FRONTEND_PATH" || exit 1
-		USER_RUN "$PYTHON" manage.py shell
+		USER_RUN "$FRONTEND_PYTHON" manage.py shell
 		;;
 	*)
 		echo "Usage: ${0#**/} <shell|venv|django-shell>"

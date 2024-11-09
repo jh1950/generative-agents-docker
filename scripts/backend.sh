@@ -71,8 +71,8 @@ if [ "$BACKGROUND" != "&" ]; then
 fi
 
 if [ "${#args[@]}" -ge 3 ]; then
-	USER_RUN "$PYTHON" reverie.py "<<<" "\"$(JOIN $'\n' "${args[@]}")\"" "$BACKGROUND"
+	USER_RUN "$BACKEND_PYTHON" reverie.py "<<<" "\"$(JOIN $'\n' "${args[@]}")\"" "$BACKGROUND"
 else
-	USER_RUN "$PYTHON" reverie.py
+	USER_RUN "$BACKEND_PYTHON" reverie.py
 	ACTION "Back-end is Stopped"
 fi

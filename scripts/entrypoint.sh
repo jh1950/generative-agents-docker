@@ -17,17 +17,13 @@ fi
 
 
 
-# pyenv init
-mkdir -p "$PYENV_VERSIONS_SAVE_PATH"
-test -e "$PYENV_ROOT/versions" || ln -s "$PYENV_VERSIONS_SAVE_PATH" "$PYENV_ROOT/versions"
-eval "$(pyenv init -)"
-
 ACTION "Change UID/PID"
 INFO "User UID: $PUID"
 INFO "User GID: $PGID"
+mkdir -p "$DATA_DIR"
 usermod -o -u "$PUID" "$USER" > /dev/null 2>&1
 groupmod -o -g "$PGID" "$USER" > /dev/null 2>&1
-chown -R "$USER":"$USER" "$DATA_DIR" "$PYENV_ROOT" "/home/$USER" /scripts
+chown -R "$USER":"$USER" "$DATA_DIR" "/home/$USER" /scripts
 
 
 
