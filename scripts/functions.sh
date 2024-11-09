@@ -137,8 +137,8 @@ INSTALL_PYTHON_MODULES() {
 	cd "$DIR" || return
 
 	if tmp_file="$(MODULE_UPDATE_REQUIRED "$REQS_PATH" "$VIRTUALENV_NAME")"; then
-		$PYENV_VERSIONS/$VIRTUALENV_NAME/bin/pip3 install -U pip
-		$PYENV_VERSIONS/$VIRTUALENV_NAME/bin/pip3 install -Ur "$REQS_PATH" || return 1
+		"$PYENV_VERSIONS/$VIRTUALENV_NAME"/bin/pip3 install -U pip
+		"$PYENV_VERSIONS/$VIRTUALENV_NAME"/bin/pip3 install -Ur "$REQS_PATH" || return 1
 		mv "$tmp_file" "$PYENV_VERSIONS/$VIRTUALENV_NAME/.installed"
 	fi
 }
