@@ -5,7 +5,6 @@ LABEL maintainer="rlawnsgl191@gmail.com"
 ARG VERSION="unknown"
 ENV IMAGE_VERSION=$VERSION \
     DATA_DIR="/data" \
-    PYENV_ROOT="/data/pyenv" \
     PYENV_ROOT="/pyenv" \
     PYENV_VERSIONS_SAVE_ROOT="pyenv-versions" \
     USER="user"

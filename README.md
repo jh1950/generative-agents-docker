@@ -143,7 +143,7 @@ docker exec -it generative_agents <venv|django-shell> # v0.4.0 ~
 | OPENAI_API_OWNER                                | OpenAI API Key 소유자 (`BACKEND_CUSTOM_UTILS_PY` 값이 `false`일 경우 사용) | -                                                       | `string`                                                                                         | 0.5.0       |
 
 \* 빈값 설정 시 관련 기능이 진행되지 않습니다.
-\*\* 여러 컨테이너에서 같은 볼륨을 사용하는 경우 활용 가능합니다. (파이썬은 `*_PYTHON_VERSION` 값이 설정된 경우에만 적용)
+\*\* 여러 컨테이너에서 같은 볼륨을 사용하는 경우 활용 가능합니다. (`*_PYTHON_VERSION` 값이 설정된 경우에만 적용)
 
 <!-- markdownlint-disable-next-line -->
 <details><summary>제거된 변수 목록</summary>
