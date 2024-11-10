@@ -102,18 +102,17 @@ F_TMP() {
 
 	if [ -z "$PYTHON_VERSION" ]; then
 		:
-	elif [ "$PYTHON_AWAIT_INSTALL" = true ] || FILE_EXISTS "$LOCKFILE_ENV"; then
+	elif [ "$PYTHON_AWAIT_INSTALL" = true ] || [ -s "$LOCKFILE_ENV" ]; then
 		AWAIT+=("$VIRTUALENV_NAME")
 	else
-		touch "$LOCKFILE_ENV"
-		if FILE_EXISTS "$LOCKFILE_PY"; then
+		hostname | tee "$LOCKFILE_PY" > "$LOCKFILE_ENV"
+
+		if [ "$(cat "$LOCKFILE_PY")" != "$HOSTNAME" ]; then
 			INFO "Waiting for $PYTHON_VERSION to be installed..."
 			while FILE_EXISTS "$LOCKFILE_PY"; do
 				sleep 3s
 			done
 		else
-			touch "$LOCKFILE_PY"
-
 			# Python Installation
 			ACTION "Starting Python Installation"
 			INFO "Path: ${DIR#/}"
@@ -123,15 +122,19 @@ F_TMP() {
 			rm -f "$LOCKFILE_PY"
 		fi
 
-		CREATE_VENV "$PYTHON_VERSION" "$VIRTUALENV_NAME"
-		# Python Modules Update
-		if [ -n "$REQS_PATH" ]; then
-			ACTION "Starting Python Modules Update"
-			INFO "Flie: ${REQS_PATH#/}"
-			FILE_EXISTS "$REQS_PATH" || WARNING "Not found"
-			INSTALL_PYTHON_MODULES "$DIR" "$REQS_PATH" "$VIRTUALENV_NAME" || { ERROR "Update Error"; exit 1; }
+		if [ "$(cat "$LOCKFILE_ENV")" != "$HOSTNAME" ]; then
+			AWAIT+=("$VIRTUALENV_NAME")
+		else
+			CREATE_VENV "$PYTHON_VERSION" "$VIRTUALENV_NAME"
+			# Python Modules Update
+			if [ -n "$REQS_PATH" ]; then
+				ACTION "Starting Python Modules Update"
+				INFO "Flie: ${REQS_PATH#/}"
+				FILE_EXISTS "$REQS_PATH" || WARNING "Not found"
+				INSTALL_PYTHON_MODULES "$DIR" "$REQS_PATH" "$VIRTUALENV_NAME" || { ERROR "Update Error"; exit 1; }
+			fi
+			rm -f "$LOCKFILE_ENV"
 		fi
-		rm -f "$LOCKFILE_ENV"
 	fi
 }
 F_TMP "SERVER_" "$DATA_DIR" "$SERVER_PYTHON_VERSION" "$SERVER_REQS_PATH" "$SERVER_VIRTUALENV_NAME" "$SERVER_PYTHON_AWAIT_INSTALL"
