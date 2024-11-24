@@ -214,7 +214,7 @@ USER_RUN() {
 		if grep -q ^"$*"$ /etc/shells; then
 			su "$USER" -s "$*"
 		else
-			su "$USER" -c "$*"
+			su "$USER" --session-command "$*"
 		fi
 	else
 		"$@"
